@@ -1,7 +1,7 @@
 Package: banditr
 Type: Package
-Title: Estimation of Linear UCB Multi-Armed Bandit Algorithms
-Version: 0.1.0
+Title: Estimation of Multi-Armed Bandit Algorithms
+Version: 0.2.0
 Authors@R: person("Romain", "Ferrali", email = "rferrali@gmail.com", 
   role = c("aut","cre"))
 Description: Estimation of linear UCB multi-armed bandit algorithms for
@@ -12,23 +12,31 @@ LazyData: true
 Imports:
     glmnet (>= 2.0),
     MASS (>= 7.3),
-    tibble (>= 1.2),
     zoo (>= 1.7),
     stringi (>= 1.1.2),
-    RODBC (>= 1.3)
-RoxygenNote: 5.0.1
+    RODBC (>= 1.3), 
+    rstanarm, 
+    lme4
+RoxygenNote: 6.0.1
 Suggests:
     testthat
-Collate:
+Collate: 
     'bandit.R'
-    'banditDb.R'
-    'banditMethods.R'
-    'banditDbMethods.R'
-    'banditDf.R'
-    'banditDfMethods.R'
     'banditGlmnet.R'
     'banditModel.R'
+    'banditThompson.R'
+    'banditUcb.R'
+    'coef.R'
+    'data.R'
     'dbHelper.R'
+    'formula.R'
+    'get.R'
     'helpers.R'
+    'model.frame.R'
+    'plot.R'
+    'predict.R'
     'protoBanditGlmnet.R'
+    'statistics.R'
+    'summary.R'
+    'test.R'
     'todo.R'

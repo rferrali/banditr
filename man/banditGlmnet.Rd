@@ -36,4 +36,3 @@ a banditGlmnet object.
 \description{
 Estimate a banditGlmnet model
 }
-

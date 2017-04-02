@@ -20,27 +20,27 @@ test_that("bandit initializes correctly, RC methods work", {
   startError$v1[1:5] <- NA
 
 
-  expect_error(banditDf(formula = f, family = "binomial", data = startError))
-  expect_error(banditDb(formula = f, family = "binomial", data = startError,
+  expect_error(bandit_ucb(formula = f, family = "binomial", data = startError))
+  expect_error(bandit_ucb(formula = f, family = "binomial", data = startError,
                         db = list(connection = 'driver={SQL Server};server=DESKTOP-99SSI5O\\SQLEXPRESS;database=tafra'),
                         path = "../../../test/"))
 
   startError <- start
   startError$id <- NULL
-  expect_error(banditDf(formula = f, family = "binomial", data = startError))
-  expect_error(banditDb(formula = f, family = "binomial", data = startError,
+  expect_error(bandit_ucb(formula = f, family = "binomial", data = startError))
+  expect_error(bandit_ucb(formula = f, family = "binomial", data = startError,
                         db = list(connection = 'driver={SQL Server};server=DESKTOP-99SSI5O\\SQLEXPRESS;database=tafra'),
                         path = "../../../test/"))
 
   startError <- start
   startError$jobOutcome <- 1
-  expect_error(banditDf(formula = f, family = "binomial", data = startError))
-  expect_error(banditDb(formula = f, family = "binomial", data = startError,
+  expect_error(bandit_ucb(formula = f, family = "binomial", data = startError))
+  expect_error(bandit_ucb(formula = f, family = "binomial", data = startError,
                         db = list(connection = 'driver={SQL Server};server=DESKTOP-99SSI5O\\SQLEXPRESS;database=tafra'),
                         path = "../../../test/"))
 
-  b1 <- banditDf(formula = f, family = "binomial", data = start)
-  b2 <- banditDb(formula = f, family = "binomial", data = start,
+  b1 <- bandit_ucb(formula = f, family = "binomial", data = start)
+  b2 <- bandit_ucb(formula = f, family = "binomial", data = start,
                  db = list(connection = 'driver={SQL Server};server=DESKTOP-99SSI5O\\SQLEXPRESS;database=tafra'),
                  path = "../../../test/")
   # b2 <- banditDb(formula = f, family = "binomial", data = start,

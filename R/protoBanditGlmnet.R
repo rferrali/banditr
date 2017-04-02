@@ -54,6 +54,19 @@ protoBanditGlmnet.default <- function(formula,
   return(out)
 }
 
+coef.protoBanditGlmnet <- function(object) {
+  coef <- glmnet::coef.glmnet(object$glmnet)[,1]
+  if(is.null(object$lasso)) {
+    return(coef)
+  } else {
+    c2 <- glmnet::coef.glmnet(object$lasso)[,1]
+    coef <- coef[match(names(c2), names(coef))]
+    names(coef) <- names(c2)
+    coef[is.na(coef)] <- 0
+    return(coef)
+  }
+}
+
 
 tuneBandit <- function(param,
                  value,

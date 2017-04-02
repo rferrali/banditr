@@ -2,8 +2,8 @@
 % Please edit documentation in R/bandit.R
 \docType{class}
 \name{bandit-class}
-\alias{bandit}
 \alias{bandit-class}
+\alias{bandit}
 \title{A bandit reference class (RC) object.}
 \description{
 A bandit reference class (RC) object.
@@ -36,20 +36,23 @@ to that class): a symbolic description of the model that is fitted.}
 
 \item{\code{\code{variables}}}{a character vectors of variables extracted from the bandit formula.}
 }}
+
 \section{Methods}{
 
 \describe{
+\item{\code{addOutcomes(y, ...)}}{add outcomes to the bandit. y is a named vector whose names are samples ids.}
+
 \item{\code{addSamples(df)}}{add samples to the bandit. \code{df} is coercible to a data.frame, and can be appended
 to the \code{data.frame} used at creation. In particular, it contains an \code{id} column
 that is a primary key.}
 
-\item{\code{initialize(formula, data, alpha = 1, contrasts = NULL, ...)}}{initialization function}
+\item{\code{initialize(formula, data, family, contrasts = NULL, newLevels = FALSE,
+  db = NULL, path = NULL, ...)}}{initialization function}
 
-\item{\code{train(data, seed = NULL, parRidge = NULL, parLasso = NULL)}}{train the bandit using available samples and latest values of the tuning
+\item{\code{train(FUN, args, seed)}}{train the bandit using available samples and latest values of the tuning
 parameters.}
 
-\item{\code{tune(data, param = "lambdaRidge", value = "auto",
-  lambdaAuto = "lambda.1se", parCvGlmnet = NULL, seed = NULL)}}{set the value of a tuning parameter of the bandit. \code{param} is either
+\item{\code{tune(FUN, args, seed)}}{set the value of a tuning parameter of the bandit. \code{param} is either
 \code{'lambdaRidge'} (the default) or \code{'lambdaLasso'}. Setting
 \code{lambdaLasso} > 0 enables a first stage of variable selection.
 \code{value} is either a scalar in [0,1] or 'auto'. If
@@ -59,5 +62,7 @@ depending on which outcome of \code{\link[glmnet]{cv.glmnet}} should be selected
 is ignored if \code{value} is not \code{'auto'}. \code{parCvGlmnet} is a list of
 parameters passed to \code{\link[glmnet]{cv.glmnet}}. This parameter is ignored if
 \code{value} is not \code{'auto'}.}
+
+\item{\code{undo()}}{cancels the last job.}
 }}
 
