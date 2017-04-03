@@ -367,7 +367,7 @@ rJobs.dbData <- function(data, what) {
     df <- RODBC::sqlQuery(conn, "SELECT TOP 1 * FROM dbo.jobs WHERE type = 'train' ORDER BY job DESC")
   }
   if(what == "all") {
-    df <- RODBC::sqlQuery(conn, "SELECT * FROM dbo.jobs ORDER BY job DESC")
+    df <- RODBC::sqlQuery(conn, "SELECT * FROM dbo.jobs")
   }
   RODBC::odbcClose(conn)
   return(df)
