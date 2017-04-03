@@ -16,7 +16,8 @@ Imports:
     stringi (>= 1.1.2),
     RODBC (>= 1.3), 
     rstanarm, 
-    lme4
+    lme4, 
+    methods
 RoxygenNote: 6.0.1
 Suggests:
     testthat
