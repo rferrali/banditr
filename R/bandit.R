@@ -1,5 +1,7 @@
+#' @import methods
+
 #' A bandit reference class (RC) object.
-#'
+
 #'
 #' @field samples a tibble containing samples.
 #' @field models a tibble containing trained models.
