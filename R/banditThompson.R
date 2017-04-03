@@ -1,3 +1,4 @@
+
 bandit_thompson <- setRefClass("bandit_thompson",
                          contains = "bandit",
                          fields = list(gamma = "numeric"))

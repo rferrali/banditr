@@ -1,22 +1,9 @@
 #' @include banditUcb.R
 #' @include banditThompson.R
 
-#' Predicted values based on a model in the bandit.
+
 #' @export
 #' @import glmnet
-#'
-#' @param object a bandit object
-#' @param samplesId (optional) the ids of some samples
-#' @param modelId (optional) the id of a training job.
-#' @param stage a character in 'ridge', 'lasso' for the stage of the desired model.
-#' @param type a character containing one or more of the following:
-#' "link","response","class","uncertainty","score"
-#' @param robust for type = uncertainty, should robust estimation be used?
-#'
-#' @return a vector of predicted values, if only one type is selected. Otherwise, a
-#' data.frame of predicted values. If a data.frame is returned, row.names refer to the
-#' ids of samples. The default returns the predicted values for all the samples for
-#' which the outcome is missing, using the last model.
 
 
 predict.bandit <- function(object,
@@ -29,6 +16,7 @@ predict.bandit <- function(object,
   return(list(model = model,
               samples = samples))
 }
+
 
 predict.bandit_ucb <- function(object,
                                whatSamples = "remaining",
@@ -87,6 +75,8 @@ predict.bandit_ucb <- function(object,
   makePredict(out, names = data$samples$id)
 }
 
+#' @export
+
 predict.bandit_thompson <- function(object,
                                     whatSamples = "remaining",
                                     whatModel = "last",
@@ -128,7 +118,8 @@ predict.bandit_thompson <- function(object,
   makePredict(out, names = id)
 }
 
-
 setMethod("predict", signature(object = "bandit"), predict.bandit)
+#' @export
 setMethod("predict", signature(object = "bandit_ucb"), predict.bandit_ucb)
+#' @export
 setMethod("predict", signature(object = "bandit_thompson"), predict.bandit_thompson)

@@ -8,11 +8,14 @@ getSamples <- function(object, what = "current") {
   rSamples(object$banditData, what)
 }
 
+
+#' @export
 getJobs <- function(object, what = "all") {
   what <- match.arg(what, c("last", "all"))
   rJobs(object$banditData, what)
 }
 
+#' @export
 getModel.bandit <- function(object, what = "last") {
   if(length(what) > 1) stop("select only one model.")
   if(what == "last") {
@@ -82,12 +85,19 @@ getModel.bandit_stan_glmer <- function(object, what = "last") {
 }
 
 
+#' @export
 setGeneric("getModel", function(object, what = "last") {})
+#' @export
 setMethod("getModel", signature(object = "bandit"), getModel.bandit)
+#' @export
 setMethod("getModel", signature(object = "bandit_ucb"), getModel.bandit_ucb)
+#' @export
 setMethod("getModel", signature(object = "bandit_thompson"), getModel.bandit_thompson)
+#' @export
 setMethod("getModel", signature(object = "bandit_stan_lm"), getModel.bandit_stan_lm)
+#' @export
 setMethod("getModel", signature(object = "bandit_stan_glm"), getModel.bandit_stan_glm)
+#' @export
 setMethod("getModel", signature(object = "bandit_stan_glmer"), getModel.bandit_stan_glmer)
 
 

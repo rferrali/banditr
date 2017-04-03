@@ -13,10 +13,12 @@ plot.bandit <- function(x, what = "reward", ...) {
 }
 
 setMethod("plot", signature(x = "bandit"), plot.bandit)
+#' @export
 setMethod("plot", signature(x = "bandit_ucb"), function(x, what = "reward", ...) {
   what <- match.arg(what, c("reward", "uncertainty", "MSE", "tuning", "coef"))
   callNextMethod()
 })
+#' @export
 setMethod("plot", signature(x = "bandit_thompson"), function(x, what = "reward", ...) {
   what <- match.arg(what, c("reward", "coef"))
   callNextMethod()

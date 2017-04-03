@@ -1,6 +1,7 @@
 #' @include banditUcb.R
 #' @include banditThompson.R
 
+#' @export
 summary.bandit <- function(object, ...) {
   out <- rSummary(object$banditData)
   stats <- rStatistics(object$banditData)
@@ -14,8 +15,10 @@ summary.bandit <- function(object, ...) {
   return(out)
 }
 
+#' @export
 setMethod("summary", signature(object = "bandit"), summary.bandit)
 
+#' @export
 print.summary.bandit <- function(x) {
   cat("Bandit started", as.character(x$start))
   cat("\nFormula: ")

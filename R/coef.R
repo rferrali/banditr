@@ -2,14 +2,7 @@
 #' @include banditThompson.R
 
 
-#' Export model coefficients.
 #' @export
-#'
-#' @param object a bandit object
-#' @param modelId (optional) a vector of ids of training jobs.
-#' @param restricted a character in 'ridge', 'lasso' for the stage of the desired model.
-#' @return Coefficients extracted from the model modelId. The default returns the ridge
-#' coefficients of the last model.
 
 coef.bandit <- function(object, what = "last") {
   what <- match.arg(what, c("last", "all"))
@@ -39,6 +32,8 @@ coef.merMod <- function(object, what = "last") {
   }
 }
 
+#' @export
 setMethod("coef", signature(object = "bandit"), coef.bandit)
+#' @export
 setMethod("coef", signature(object = "bandit_stan_glmer"), coef.merMod)
 

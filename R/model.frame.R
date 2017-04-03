@@ -2,19 +2,7 @@
 #' @include banditThompson.R
 
 
-#' Extracting the model frame used by some model in the bandit.
-#'
 #' @export
-#'
-#' @param object a bandit object
-#' @param modelId (optional) the id of a training job.
-#' @param reduced (optional) logical; if TRUE and some variable selection was used, the model.frame
-#' of the reduced model is returned.
-#' @param  data  an optional data.frame, list or environment
-#' (or object coercible by as.data.frame to a data.frame),
-#' containing the variables in formula. Neither a matrix nor an array will be accepted.
-#' @return by default, the model.frame used in the last model.
-#'
 
 model.frame.bandit <- function(formula, what = "last", ...) {
   f <- formula(formula, what = what, reduced = FALSE)
@@ -47,5 +35,7 @@ model.frame.bandit_merMod <- function(formula, what = "last") {
 }
 
 setMethod("model.frame", signature(formula = "bandit"), model.frame.bandit)
+#' @export
 setMethod("model.frame", signature(formula = "bandit_ucb"), model.frame.bandit_ucb)
+#' @export
 setMethod("model.frame", signature(formula = "bandit_stan_glmer"), model.frame.bandit_merMod)
