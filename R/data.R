@@ -264,7 +264,7 @@ dJobs.dbData <- function(data) {
   data
 }
 
-dCoef <- function(data) UseMethod("dCoefs", data)
+dCoef <- function(data) UseMethod("dCoef", data)
 dCoef.dfData <- function(data) {
   data$coefs <- data$coefs[-nrow(data$coefs),]
   data

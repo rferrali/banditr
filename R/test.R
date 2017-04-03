@@ -51,11 +51,13 @@
 # dg <- cbind(df, fac = sample(letters, nrow(df), replace = T))
 # fg <- update(f, . ~ . + (1|f))
 # sg <- dg[1:100,]
-# b1 <- bandit_stan_glmer(formula = y ~ v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + (1 | fac) + v10,
+# b1 <- bandit_stan_glmer(formula = y ~ v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8*v9 + (1 | fac) + v10,
 #                         data = sg, family = "binomial",
 #                         db = list(connection = 'driver={SQL Server};server=DESKTOP-99SSI5O\\SQLEXPRESS;database=tafra'),
 #                         path = "../test/")
 # b1$train(iter = 1000, chains = 1)
+# debug(b1$undo)
+# b1$undo()
 # addg <- dg[101:105,]
 # addy <- addg$y
 # names(addy) <- addg$id
