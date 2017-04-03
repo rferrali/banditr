@@ -1,8 +1,6 @@
-#' @import methods
 
 #' A bandit reference class (RC) object.
 
-#'
 #' @field samples a tibble containing samples.
 #' @field models a tibble containing trained models.
 #' @field jobs a tibble containing completed jobs.
@@ -16,6 +14,7 @@
 #' @field \code{currentModel} the prototype of the latest fit.
 #' @field \code{currentParams} a list of tuning parameters.
 #' @field \code{variables} a character vectors of variables extracted from the bandit formula.
+#' @import methods
 
 
 
