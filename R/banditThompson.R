@@ -1,3 +1,6 @@
+#' A Thompson sampling bandit reference class (RC) object.
+
+#' @field \code{gamma} the blabla tuning parameter. See details.
 
 bandit_thompson <- setRefClass("bandit_thompson",
                          contains = "bandit",

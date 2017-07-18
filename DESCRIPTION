@@ -20,8 +20,10 @@ Imports:
     methods
 RoxygenNote: 6.0.1
 Suggests:
-    testthat
-Collate: 
+    testthat,
+    knitr,
+    rmarkdown
+Collate:
     'bandit.R'
     'banditGlmnet.R'
     'banditModel.R'
@@ -41,3 +43,4 @@ Collate:
     'summary.R'
     'test.R'
     'todo.R'
+VignetteBuilder: knitr

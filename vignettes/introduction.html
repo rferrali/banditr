@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Romain Ferrali" />
+
+<meta name="date" content="2017-07-18" />
+
+<title>Introduction to banditr</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction to <code>banditr</code></h1>
+<h4 class="author"><em>Romain Ferrali</em></h4>
+<h4 class="date"><em>2017-07-18</em></h4>
+
+
+
+<p>As Scott <span class="citation">[-@Scott2010]</span> defines:</p>
+<blockquote>
+<p>A <em>multi-armed bandit</em> is a sequential experiment with the goal of achieving the largest possible reward from a payoff distribution with unknown parameters. At each stage, the experimenter must decide which arm of the experiment to observe next. The choice involves a fundamental trade-off between the utility gain from exploiting arms that appear to be doing well (based on limited sample information) vs exploring arms that might potentially be optimal, but which appear to be inferior because of sampling variability.</p>
+</blockquote>
+<p>The <code>banditr</code> package implements several popular algorithms that solve the multi-armed bandit problem. Currently, the package supports two algorithms:</p>
+<ul>
+<li>Thompson sampling <span class="citation">[@Scott2010]</span>, using the <a href="https://cran.r-project.org/web/packages/rstanarm/index.html"><code>rstanarm</code></a> package.</li>
+<li>Linear Upper Confidence Bound <span class="citation">[LinUCB, @Li2010a]</span>, with optional dimensionality reduction (Egami &amp; Imai ???), using the <a href="https://cran.r-project.org/web/packages/glmnet/index.html"><code>glmnet</code></a> package.</li>
+</ul>
+<p>The <code>banditr</code> package provides a comprehensive solution that handles the entire experimental sequence. Because such sequential experiments may involve large amounts of data, the package allows storing its data locally, as a self-contained R object, but also remotely, using the host’s filesystem and a database management system (DBMS). Currently, the package supports one DBMS: Microsoft SQL Server, through the <a href="https://cran.r-project.org/web/packages/RODBC/index.html"><code>RODBC</code></a> package.</p>
+<p>This vignette gives an overview of how <code>banditr</code> handles <code>bandit</code> objects, using a LinUCB bandit as an example. Other vignettes detail:</p>
+<ul>
+<li>How to use <code>banditr</code> with a DBMS</li>
+<li>Specifics of LinUCB bandits</li>
+<li>Specifics of Thompson sampling bandits</li>
+</ul>
+<div id="creating-a-bandit-object" class="section level2">
+<h2>Creating a bandit object</h2>
+<p>First, let’s simulate data according to the following payoff distribution: <span class="math display">\[
+\Pr(y_i = 1 | x_i) = \text{logit}\left(\sum_{j=-4}^{5} \beta_j x_{ij}  \right), 
+\]</span> where <span class="math inline">\(\text{logit}\)</span> is the logistic function <span class="math inline">\(\text{logit}(x) = \frac{1}{1+\exp(-x)}\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">999</span>)
+x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="fl">10e3</span>), <span class="fl">1e3</span>, <span class="dv">10</span>)
+beta &lt;-<span class="st"> </span>-<span class="dv">4</span>:<span class="dv">5</span>
+y &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(<span class="kw">plogis</span>(x %*%<span class="st"> </span>beta))
+y &lt;-<span class="st"> </span><span class="kw">sapply</span>(y, rbinom, <span class="dt">n =</span> <span class="dv">1</span>, <span class="dt">size =</span> <span class="dv">1</span>)
+<span class="kw">colnames</span>(x) &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;v&quot;</span>, <span class="dv">1</span>:<span class="dv">10</span>)
+
+df &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(x)
+df &lt;-<span class="st"> </span><span class="kw">cbind</span>(y, df)</code></pre></div>
+<p>The package uses Reference Classes (RC) to store bandit objects. To handle future samples in the experimental sequence, the data needs to contain an <code>id</code> column, that serves as a primary key, and a column named <code>y</code> that contains the ouctome.</p>
+<p>In this vignette, we create a LinUCB bandit that uses a binomial logistic regression. By default, the package uses a value of <span class="math inline">\(\alpha = 1\)</span> as a tuning parameter. Let’s create a bandit and inspect it.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dt">id =</span> <span class="dv">1</span>:<span class="dv">1000</span>, df) <span class="co"># add a primary key to the data</span>
+
+<span class="kw">library</span>(banditr) <span class="co"># initialize the bandit using the first 100 samples</span>
+start &lt;-<span class="st"> </span>df[<span class="dv">1</span>:<span class="dv">100</span>,]
+bdt &lt;-<span class="st"> </span><span class="kw">bandit_ucb</span>(<span class="dt">formula =</span> y ~<span class="st"> </span>-<span class="dv">1</span> +<span class="st"> </span>v1 +<span class="st"> </span>v2 +<span class="st"> </span>v3 +<span class="st"> </span>v4 +<span class="st"> </span>v5 +<span class="st"> </span>v6 +<span class="st"> </span>v7 +<span class="st"> </span>v8 +<span class="st"> </span>v9 +<span class="st"> </span>v10, 
+                  <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>, 
+                  <span class="dt">data =</span> start)
+<span class="kw">summary</span>(bdt)</code></pre></div>
+<pre><code>## Bandit started 2017-07-18 14:10:55
+## Formula: y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10
+## 
+## Family: 
+## binomial
+## 
+## Coefficients: 
+## No training job found. 
+## 
+## Size of training set: 100 samples
+## Number of training jobs: 0
+## Number of tuning jobs: 0
+## Reward: 0/0
+## 
+## Last jobs:
+##  job                date       type param value
+##    1 2017-07-18 14:10:55 initialize    NA    NA</code></pre>
+</div>
+<div id="managing-the-experiment" class="section level2">
+<h2>Managing the experiment</h2>
+<p>The user manages the experiment by performing jobs on the bandit. First, let’s update the model using our current training set.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bdt$<span class="kw">train</span>()
+<span class="kw">summary</span>(bdt)</code></pre></div>
+<pre><code>## Bandit started 2017-07-18 14:10:55
+## Formula: y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10
+## 
+## Family: 
+## binomial
+## 
+## Coefficients: 
+## (Intercept)          v1          v2          v3          v4          v5 
+##      0.0000     -6.1726     -2.9095     -2.2445     -1.0964      1.4699 
+##          v6          v7          v8          v9         v10 
+##      1.8523      3.7527      4.3398      5.4517      6.5306 
+## 
+## Size of training set: 100 samples
+## Number of training jobs: 1
+## Number of tuning jobs: 0
+## Reward: 0/0
+## 
+## Last jobs:
+##  job                date       type param value
+##    1 2017-07-18 14:10:55 initialize    NA    NA
+##    2 2017-07-18 14:10:55      train    NA    NA</code></pre>
+<p>We then add experimental arms to the bandit, and obtain their score, as per the LinUCB algorithm:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">add &lt;-<span class="st"> </span>df[<span class="dv">101</span>:<span class="dv">1000</span>,]
+add$y &lt;-<span class="st"> </span><span class="ot">NA</span> <span class="co"># let's pretend we haven't observed the reward yet. </span>
+bdt$<span class="kw">addSamples</span>(add)
+
+pr &lt;-<span class="st"> </span><span class="kw">predict</span>(bdt)
+<span class="kw">head</span>(pr)</code></pre></div>
+<pre><code>##         response uncertainty     score
+## 101 7.231030e-12   0.4228400 0.4228400
+## 102 9.393602e-01   0.3499187 1.2892789
+## 103 9.061797e-01   0.3338683 1.2400480
+## 104 3.404016e-02   0.2212835 0.2553237
+## 105 6.698767e-01   0.3353260 1.0052026
+## 106 9.994085e-01   0.4381338 1.4375423</code></pre>
+<p>For LinUCB bandits, the <code>predict</code> method returns a <code>data.frame</code> with the predicted response of all experimental arms whose outcome is missing, and their score. The LinUCB algorithm requires observing the outcome of the experimental arm with the highest score.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">id &lt;-<span class="st"> </span><span class="kw">rownames</span>(pr)[<span class="kw">which.max</span>(pr$score)]
+y &lt;-<span class="st"> </span>df$y[df$id ==<span class="st"> </span>id]
+y</code></pre></div>
+<pre><code>## [1] 1</code></pre>
+<p>Let’s add this newly observed outcome to the bandit, and update the model with this new information. Outcomes must be added as a named vector, with names pointing to the ids of the corresponding arms.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">names</span>(y) &lt;-<span class="st"> </span>id
+bdt$<span class="kw">addOutcomes</span>(y) <span class="co"># add the new outcome to the bandit</span>
+bdt$<span class="kw">train</span>() <span class="co"># update it</span></code></pre></div>
+<p>Let’s do this task a few times.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">for (i in <span class="dv">1</span>:<span class="dv">20</span>) {
+  pr &lt;-<span class="st"> </span><span class="kw">predict</span>(bdt)
+  id &lt;-<span class="st"> </span><span class="kw">rownames</span>(pr)[<span class="kw">which.max</span>(pr$score)]
+  y &lt;-<span class="st"> </span>df$y[df$id ==<span class="st"> </span>id]
+  <span class="kw">names</span>(y) &lt;-<span class="st"> </span>id
+  bdt$<span class="kw">addOutcomes</span>(y)
+  bdt$<span class="kw">train</span>()
+}</code></pre></div>
+</div>
+<div id="diagnostics" class="section level2">
+<h2>Diagnostics</h2>
+<p>The <code>banditr</code> package provides a few built-in diagnostic plots, and allows for convenient extraction of relevant objects for further exploration.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(bdt) <span class="co"># the default diagnostic: cumulative reward over time</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(bdt, <span class="dt">what =</span> <span class="st">&quot;coef&quot;</span>) <span class="co"># parameter values over time</span>
+<span class="co"># plot(bdt, what = &quot;MSE&quot;)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Besides the standard <code>coef</code> method to extract current model coefficients, other extraction methods are prefixed with <code>get</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(bdt)</code></pre></div>
+<pre><code>## (Intercept)          v1          v2          v3          v4          v5 
+##    0.000000   -6.179643   -2.912204   -2.245834   -1.097903    1.472547 
+##          v6          v7          v8          v9         v10 
+##    1.854981    3.756264    4.343699    5.457310    6.536681</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mod &lt;-<span class="st"> </span><span class="kw">getModel</span>(bdt) <span class="co"># extract the last model</span>
+mf &lt;-<span class="st"> </span><span class="kw">getSamples</span>(bdt) <span class="co"># extract complete samples</span>
+jobs &lt;-<span class="st"> </span><span class="kw">getJobs</span>(bdt) <span class="co"># extract a summary of all jobs</span></code></pre></div>
+</div>
+<div id="references" class="section level1">
+<h1>References</h1>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

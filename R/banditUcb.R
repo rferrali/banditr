@@ -1,5 +1,12 @@
+
+#' An UCB bandit reference class (RC) object.
+
+#' @field \code{alpha} the linear UCB tuning parameter. See details.
+#' @field \code{family} supported response type. See banditGlmnet for details.
+
 #' @export bandit_ucb
 #' @exportClass bandit_ucb
+
 
 bandit_ucb <- setRefClass("bandit_ucb",
                          contains = "bandit",

@@ -23,12 +23,16 @@ print.summary.bandit <- function(x) {
   cat("Bandit started", as.character(x$start))
   cat("\nFormula: ")
   print(x$formula)
-  cat("\nFamily: ")
-  print(x$family)
+  cat("\nFamily: \n")
+  cat(x$family)
   # cat("Lambda Ridge:", round(x$lambdaRidge, 4), ifelse(x$autoRidge, "(auto)", "(manual)"))
   # cat("\nLambda Lasso:", round(x$lambdaLasso, 4), ifelse(x$autoLasso, "(auto)", "(manual)"))
   cat("\n\nCoefficients: \n")
-  print(round(x$coef, 4))
+  if(!is.null(x$coef)) {
+    print(round(x$coef, 4))
+  } else {
+    cat("No training job found. \n")
+  }
   cat("\nSize of training set:", x$N, "samples")
   cat("\nNumber of training jobs:", x$nTraining)
   cat("\nNumber of tuning jobs:", x$nTuning)

@@ -1,19 +1,16 @@
 
 #' A bandit reference class (RC) object.
 
-#' @field samples a tibble containing samples.
-#' @field models a tibble containing trained models.
-#' @field jobs a tibble containing completed jobs.
-#' @field \code{alpha} the linear UCB tuning parameter.
 #' @field \code{formula} an object of class "formula" (or one that can be coerced
 #' to that class): a symbolic description of the model that is fitted.
-#' @field \code{family} supported response type
 #' @field \code{contrasts} an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.
-#' @field \code{xlevels} (where relevant) a record of the levels of the factors used in fitting.
+#' @field \code{newLevels} a logical value indicating whether to allow for new factor levels when adding samples.  (where relevant) a record of the levels of the factors used in fitting.
+#' @field \code{xlevels} if \code{newLevels} is false, a record of the levels of the factors used in fitting.
 #' @field \code{currentJob} a numeric with the id of the current job.
 #' @field \code{currentModel} the prototype of the latest fit.
 #' @field \code{currentParams} a list of tuning parameters.
-#' @field \code{variables} a character vectors of variables extracted from the bandit formula.
+#' @field \code{banditData} the bandit's data.
+#' @field \code{statistics} dunno
 #' @import methods
 
 

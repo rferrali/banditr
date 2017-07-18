@@ -1,0 +1,138 @@
+---
+title: "Introduction to `banditr`"
+author: "Romain Ferrali"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to banditr}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+bibliography: lib.bib
+---
+
+As Scott [-@Scott2010] defines: 
+
+> A _multi-armed bandit_ is a sequential experiment with the goal of achieving the largest possible reward from a payoff distribution with unknown parameters. At each stage, the experimenter must decide which arm of the experiment to observe next. The choice involves a fundamental trade-off between the utility gain from exploiting arms that appear to be doing well (based on limited sample information) vs exploring arms that might potentially be optimal, but which appear to be inferior because of sampling variability.
+
+The `banditr` package implements several popular algorithms that solve the multi-armed bandit problem. Currently, the package supports two algorithms: 
+
+* Thompson sampling [@Scott2010], using the [`rstanarm`](https://cran.r-project.org/web/packages/rstanarm/index.html) package. 
+* Linear Upper Confidence Bound [LinUCB, @Li2010a], with optional dimensionality reduction (Egami & Imai ???), using the [`glmnet`](https://cran.r-project.org/web/packages/glmnet/index.html) package. 
+
+The `banditr` package provides a comprehensive solution that handles the entire experimental sequence. Because such sequential experiments may involve large amounts of data, the package allows storing its data locally, as a self-contained R object, but also remotely, using the host's filesystem and a database management system (DBMS). Currently, the package supports one DBMS: Microsoft SQL Server, through the [`RODBC`](https://cran.r-project.org/web/packages/RODBC/index.html) package. 
+
+This vignette gives an overview of how `banditr` handles `bandit` objects, using a LinUCB bandit as an example. Other vignettes detail: 
+
+* How to use `banditr` with a DBMS
+* Specifics of LinUCB bandits
+* Specifics of Thompson sampling bandits
+
+## Creating a bandit object
+
+First, let's simulate data according to the following payoff distribution: 
+$$
+\Pr(y_i = 1 | x_i) = \text{logit}\left(\sum_{j=-4}^{5} \beta_j x_{ij}  \right), 
+$$
+where $\text{logit}$ is the logistic function $\text{logit}(x) = \frac{1}{1+\exp(-x)}$. 
+
+```{r}
+set.seed(999)
+x <- matrix(rnorm(10e3), 1e3, 10)
+beta <- -4:5
+y <- as.numeric(plogis(x %*% beta))
+y <- sapply(y, rbinom, n = 1, size = 1)
+colnames(x) <- paste0("v", 1:10)
+
+df <- as.data.frame(x)
+df <- cbind(y, df)
+```
+
+The package uses Reference Classes (RC) to store bandit objects. To handle future samples in the experimental sequence, the data needs to contain an `id` column, that serves as a primary key, and a column named `y` that contains the ouctome. 
+
+In this vignette, we create a LinUCB bandit that uses a binomial logistic regression. By default, the package uses a value of $\alpha = 1$ as a tuning parameter. Let's create a bandit and inspect it. 
+
+```{r}
+df <- cbind(id = 1:1000, df) # add a primary key to the data
+
+library(banditr) # initialize the bandit using the first 100 samples
+start <- df[1:100,]
+bdt <- bandit_ucb(formula = y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10, 
+                  family = "binomial", 
+                  data = start)
+summary(bdt)
+```
+
+## Managing the experiment
+
+The user manages the experiment by performing jobs on the bandit. First, let's update the model using our current training set. 
+
+```{r}
+bdt$train()
+summary(bdt)
+```
+
+We then add experimental arms to the bandit, and obtain their score, as per the LinUCB algorithm: 
+
+```{r}
+add <- df[101:1000,]
+add$y <- NA # let's pretend we haven't observed the reward yet. 
+bdt$addSamples(add)
+
+pr <- predict(bdt)
+head(pr)
+```
+
+For LinUCB bandits, the `predict` method returns a `data.frame` with the predicted response of all experimental arms whose outcome is missing, and their score. The LinUCB algorithm requires observing the outcome of the experimental arm with the highest score. 
+
+```{r}
+id <- rownames(pr)[which.max(pr$score)]
+y <- df$y[df$id == id]
+y
+```
+
+Let's add this newly observed outcome to the bandit, and update the model with this new information. Outcomes must be added as a named vector, with names pointing to the ids of the corresponding arms. 
+
+```{r}
+names(y) <- id
+bdt$addOutcomes(y) # add the new outcome to the bandit
+bdt$train() # update it
+```
+
+Let's do this task a few times. 
+```{r}
+for (i in 1:20) {
+  pr <- predict(bdt)
+  id <- rownames(pr)[which.max(pr$score)]
+  y <- df$y[df$id == id]
+  names(y) <- id
+  bdt$addOutcomes(y)
+  bdt$train()
+}
+```
+
+
+## Diagnostics
+
+The `banditr` package provides a few built-in diagnostic plots, and allows for convenient extraction of relevant objects for further exploration.
+
+```{r, fig.height=5, fig.width=5}
+plot(bdt) # the default diagnostic: cumulative reward over time
+```
+
+
+```{r, fig.show='hold', fig.height=5, fig.width=5}
+plot(bdt, what = "coef") # parameter values over time
+# plot(bdt, what = "MSE")
+```
+
+Besides the standard `coef` method to extract current model coefficients, other extraction methods are prefixed with `get`. 
+
+```{r}
+coef(bdt)
+mod <- getModel(bdt) # extract the last model
+mf <- getSamples(bdt) # extract complete samples
+jobs <- getJobs(bdt) # extract a summary of all jobs
+```
+
+
+# References 
