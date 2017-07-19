@@ -12,7 +12,7 @@
 
 <meta name="author" content="Romain Ferrali" />
 
-<meta name="date" content="2017-07-18" />
+<meta name="date" content="2017-07-19" />
 
 <title>Introduction to banditr</title>
 
@@ -70,18 +70,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Introduction to <code>banditr</code></h1>
 <h4 class="author"><em>Romain Ferrali</em></h4>
-<h4 class="date"><em>2017-07-18</em></h4>
+<h4 class="date"><em>2017-07-19</em></h4>
 
 
 
-<p>As Scott <span class="citation">[-@Scott2010]</span> defines:</p>
+<p>As Scott <span class="citation">(2010)</span> defines:</p>
 <blockquote>
 <p>A <em>multi-armed bandit</em> is a sequential experiment with the goal of achieving the largest possible reward from a payoff distribution with unknown parameters. At each stage, the experimenter must decide which arm of the experiment to observe next. The choice involves a fundamental trade-off between the utility gain from exploiting arms that appear to be doing well (based on limited sample information) vs exploring arms that might potentially be optimal, but which appear to be inferior because of sampling variability.</p>
 </blockquote>
 <p>The <code>banditr</code> package implements several popular algorithms that solve the multi-armed bandit problem. Currently, the package supports two algorithms:</p>
 <ul>
-<li>Thompson sampling <span class="citation">[@Scott2010]</span>, using the <a href="https://cran.r-project.org/web/packages/rstanarm/index.html"><code>rstanarm</code></a> package.</li>
-<li>Linear Upper Confidence Bound <span class="citation">[LinUCB, @Li2010a]</span>, with optional dimensionality reduction (Egami &amp; Imai ???), using the <a href="https://cran.r-project.org/web/packages/glmnet/index.html"><code>glmnet</code></a> package.</li>
+<li>Thompson sampling <span class="citation">(Scott 2010)</span>, using the <a href="https://cran.r-project.org/web/packages/rstanarm/index.html"><code>rstanarm</code></a> package.</li>
+<li>Linear Upper Confidence Bound <span class="citation">(LinUCB, Li et al. 2010)</span>, with optional dimensionality reduction (Egami &amp; Imai ???), using the <a href="https://cran.r-project.org/web/packages/glmnet/index.html"><code>glmnet</code></a> package.</li>
 </ul>
 <p>The <code>banditr</code> package provides a comprehensive solution that handles the entire experimental sequence. Because such sequential experiments may involve large amounts of data, the package allows storing its data locally, as a self-contained R object, but also remotely, using the host’s filesystem and a database management system (DBMS). Currently, the package supports one DBMS: Microsoft SQL Server, through the <a href="https://cran.r-project.org/web/packages/RODBC/index.html"><code>RODBC</code></a> package.</p>
 <p>This vignette gives an overview of how <code>banditr</code> handles <code>bandit</code> objects, using a LinUCB bandit as an example. Other vignettes detail:</p>
@@ -90,6 +90,19 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>Specifics of LinUCB bandits</li>
 <li>Specifics of Thompson sampling bandits</li>
 </ul>
+<div id="bandit-algorithms" class="section level2">
+<h2>Bandit algorithms</h2>
+<p>In the multi-armed bandit problem, the experimenter starts with <span class="math inline">\(N_0\)</span> completed experiments for which she observes the vector of outcomes <span class="math inline">\(Y_0\)</span>, and the <span class="math inline">\(N_0 \times K\)</span> matrix <span class="math inline">\(X_0\)</span> of features. She has an <span class="math inline">\(R_0 \times K\)</span> matrix <span class="math inline">\(Z\)</span> of characteristics for treatment arms for which she does not observe the outcome. At each time period <span class="math inline">\(t\)</span>, she selects a treatment arm <span class="math inline">\(i\)</span> for which she observes the outcome <span class="math inline">\(y_i\)</span>. Her goal is to solve the following maximization problem: <span class="math display">\[
+\max_{i \in \{1,...,R_t\}} y_i. 
+\]</span></p>
+<p>Bandit algorithms implement mechanisms to solve this maximization problem. Suppose the model <span class="math inline">\(Y = X \beta\)</span>. The LinUCB and Thompson sampling algorithms perform a similar task at each time period. They update the model using completed experiments, and provide a rule <span class="math inline">\(f(\beta_t, Z_t): (\mathcal{R}^{K}, \mathcal{R}^{(R_t \times K)}) \rightarrow \{1,...,R_t\}\)</span> to select the next next treatment arm:</p>
+<ul>
+<li>Observe the outcome <span class="math inline">\(y_i\)</span> of the treatment arm selected at <span class="math inline">\(t-1\)</span>.</li>
+<li><span class="math inline">\(Y_t \leftarrow (Y_{t-1}, y_i), X_t \leftarrow (X_{t-1}, z_i^T)\)</span></li>
+<li>Update the model parameters <span class="math inline">\(\hat{\beta}_t\)</span> by estimating the model <span class="math inline">\(Y_t = X_t \beta\)</span>.</li>
+<li>Select the treatment arm <span class="math inline">\(i = f(\beta_t, Z_t)\)</span></li>
+</ul>
+</div>
 <div id="creating-a-bandit-object" class="section level2">
 <h2>Creating a bandit object</h2>
 <p>First, let’s simulate data according to the following payoff distribution: <span class="math display">\[
@@ -114,7 +127,7 @@ bdt &lt;-<span class="st"> </span><span class="kw">bandit_ucb</span>(<span class
                   <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>, 
                   <span class="dt">data =</span> start)
 <span class="kw">summary</span>(bdt)</code></pre></div>
-<pre><code>## Bandit started 2017-07-18 14:10:55
+<pre><code>## Bandit started 2017-07-19 10:47:13
 ## Formula: y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10
 ## 
 ## Family: 
@@ -130,14 +143,14 @@ bdt &lt;-<span class="st"> </span><span class="kw">bandit_ucb</span>(<span class
 ## 
 ## Last jobs:
 ##  job                date       type param value
-##    1 2017-07-18 14:10:55 initialize    NA    NA</code></pre>
+##    1 2017-07-19 10:47:13 initialize    NA    NA</code></pre>
 </div>
 <div id="managing-the-experiment" class="section level2">
 <h2>Managing the experiment</h2>
 <p>The user manages the experiment by performing jobs on the bandit. First, let’s update the model using our current training set.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bdt$<span class="kw">train</span>()
 <span class="kw">summary</span>(bdt)</code></pre></div>
-<pre><code>## Bandit started 2017-07-18 14:10:55
+<pre><code>## Bandit started 2017-07-19 10:47:13
 ## Formula: y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10
 ## 
 ## Family: 
@@ -156,8 +169,8 @@ bdt &lt;-<span class="st"> </span><span class="kw">bandit_ucb</span>(<span class
 ## 
 ## Last jobs:
 ##  job                date       type param value
-##    1 2017-07-18 14:10:55 initialize    NA    NA
-##    2 2017-07-18 14:10:55      train    NA    NA</code></pre>
+##    1 2017-07-19 10:47:13 initialize    NA    NA
+##    2 2017-07-19 10:47:13      train    NA    NA</code></pre>
 <p>We then add experimental arms to the bandit, and obtain their score, as per the LinUCB algorithm:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">add &lt;-<span class="st"> </span>df[<span class="dv">101</span>:<span class="dv">1000</span>,]
 add$y &lt;-<span class="st"> </span><span class="ot">NA</span> <span class="co"># let's pretend we haven't observed the reward yet. </span>
@@ -209,8 +222,16 @@ bdt$<span class="kw">train</span>() <span class="co"># update it</span></code></
 mf &lt;-<span class="st"> </span><span class="kw">getSamples</span>(bdt) <span class="co"># extract complete samples</span>
 jobs &lt;-<span class="st"> </span><span class="kw">getJobs</span>(bdt) <span class="co"># extract a summary of all jobs</span></code></pre></div>
 </div>
-<div id="references" class="section level1">
+<div id="references" class="section level1 unnumbered">
 <h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-Li2010a">
+<p>Li, Lihong, Wei Chu, John Langford, and Robert E. Schapire. 2010. “A Contextual-Bandit Approach to Personalized News Article Recommendation.” In <em>WWW ’10 Proceedings of the 19th International Conference on World Wide Web</em>, 661–70. Railegh, NC: ACM. doi:<a href="https://doi.org/10.1145/1772690.1772758">10.1145/1772690.1772758</a>.</p>
+</div>
+<div id="ref-Scott2010">
+<p>Scott, Steven L. 2010. “A modern Bayesian look at the multi-armed bandit.” <em>Applied Stochastic Models in Business and Industry</em> 26: 639–58. doi:<a href="https://doi.org/10.1002/asmb">10.1002/asmb</a>.</p>
+</div>
+</div>
 </div>
 
 

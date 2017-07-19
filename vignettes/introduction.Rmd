@@ -27,6 +27,20 @@ This vignette gives an overview of how `banditr` handles `bandit` objects, using
 * Specifics of LinUCB bandits
 * Specifics of Thompson sampling bandits
 
+## Bandit algorithms
+
+In the multi-armed bandit problem, the experimenter starts with $N_0$  completed experiments for which she observes the vector of outcomes $Y_0$, and the $N_0 \times K$ matrix $X_0$ of features. She has an $R_0 \times K$ matrix $Z$ of characteristics for treatment arms for which she does not observe the outcome. At each time period $t$, she selects a treatment arm $i$ for which she observes the outcome $y_i$. Her goal is to solve the following maximization problem: 
+$$
+\max_{i \in \{1,...,R_t\}} y_i. 
+$$
+
+Bandit algorithms implement mechanisms to solve this maximization problem. Suppose the model $Y = X \beta$. The LinUCB and Thompson sampling algorithms perform a similar task at each time period. They update the model using completed experiments, and provide a rule $f(\beta_t, Z_t): (\mathcal{R}^{K}, \mathcal{R}^{(R_t \times K)}) \rightarrow \{1,...,R_t\}$ to select the next next treatment arm: 
+
+* Observe the outcome $y_i$ of the treatment arm selected at $t-1$. 
+* $Y_t \leftarrow (Y_{t-1}, y_i), X_t \leftarrow (X_{t-1}, z_i^T)$
+* Update the model parameters $\hat{\beta}_t$ by estimating the model $Y_t = X_t \beta$. 
+* Select the treatment arm $i = f(\beta_t, Z_t)$
+
 ## Creating a bandit object
 
 First, let's simulate data according to the following payoff distribution: 

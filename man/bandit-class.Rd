@@ -5,58 +5,52 @@
 \alias{bandit-class}
 \alias{bandit}
 \title{A bandit reference class (RC) object.}
+\arguments{
+\item{formula}{an object of class "formula" (or one that can be coerced
+to that class): a symbolic description of the model that is fitted. The response
+must be named \code{y}}
+
+\item{data}{a data frame (or object coercible by \code{\link{as.data.frame}} to a data frame)
+containing the variables in the model. \code{data} must contain a column named
+\code{id} that uniquely identifies each observation, and a column named \code{y} that
+contains the model response.}
+
+\item{family}{a character string describing the error distribtion and link function
+to be used in the model. Can be either \code{"binomial"} or \code{"gaussian"} (the default).}
+
+\item{contrasts}{an optional list. See the \code{contrasts.arg} of \code{model.matrix.default}.}
+
+\item{newLevels}{a logical value indicating whether to allow for new factor levels when
+adding samples. Default is FALSE.}
+
+\item{db}{an optional named list of arguments passed to \code{\link[RODBC]{odbcDriverConnect}}.}
+
+\item{path}{an optional character string naming a folder open for writing.}
+}
 \description{
 A bandit reference class (RC) object.
 }
 \section{Fields}{
 
 \describe{
-\item{\code{\code{formula}}}{an object of class "formula" (or one that can be coerced
+\item{\code{formula}}{an object of class "formula" (or one that can be coerced
 to that class): a symbolic description of the model that is fitted.}
 
-\item{\code{\code{contrasts}}}{an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.}
+\item{\code{contrasts}}{an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.}
 
-\item{\code{\code{newLevels}}}{a logical value indicating whether to allow for new factor levels when adding samples.  (where relevant) a record of the levels of the factors used in fitting.}
+\item{\code{newLevels}}{a logical value indicating whether to allow for new factor levels when adding samples.}
 
-\item{\code{\code{xlevels}}}{if \code{newLevels} is false, a record of the levels of the factors used in fitting.}
+\item{\code{xlevels}}{if \code{newLevels} is false, a record of the levels of the factors used in fitting.}
 
-\item{\code{\code{currentJob}}}{a numeric with the id of the current job.}
+\item{\code{currentJob}}{a numeric with the id of the current job.}
 
-\item{\code{\code{currentModel}}}{the prototype of the latest fit.}
+\item{\code{currentModel}}{the prototype of the latest fit.}
 
-\item{\code{\code{currentParams}}}{a list of tuning parameters.}
+\item{\code{currentParams}}{a list of tuning parameters.}
 
-\item{\code{\code{banditData}}}{the bandit's data.}
+\item{\code{banditData}}{the bandit's data.}
 
-\item{\code{\code{statistics}}}{dunno}
+\item{\code{statistics}}{a character vector of statistics to be computed when adding outcomes}
 }}
 
-\section{Methods}{
-
-\describe{
-\item{\code{addOutcomes(y, ...)}}{add outcomes to the bandit. y is a named vector whose names are samples ids.}
-
-\item{\code{addSamples(df)}}{add samples to the bandit. \code{df} is coercible to a data.frame, and can be appended
-to the \code{data.frame} used at creation. In particular, it contains an \code{id} column
-that is a primary key.}
-
-\item{\code{initialize(formula, data, family, contrasts = NULL, newLevels = FALSE,
-  db = NULL, path = NULL, ...)}}{initialization function}
-
-\item{\code{train(FUN, args, seed)}}{train the bandit using available samples and latest values of the tuning
-parameters.}
-
-\item{\code{tune(FUN, args, seed)}}{set the value of a tuning parameter of the bandit. \code{param} is either
-\code{'lambdaRidge'} (the default) or \code{'lambdaLasso'}. Setting
-\code{lambdaLasso} > 0 enables a first stage of variable selection.
-\code{value} is either a scalar in [0,1] or 'auto'. If
-set to \code{'auto'}, the parameter is picked using \code{\link[glmnet]{cv.glmnet}}.
-\code{lambdaAuto} is either \code{'lambda.1se'} or \code{'lambda.min'}
-depending on which outcome of \code{\link[glmnet]{cv.glmnet}} should be selected. It
-is ignored if \code{value} is not \code{'auto'}. \code{parCvGlmnet} is a list of
-parameters passed to \code{\link[glmnet]{cv.glmnet}}. This parameter is ignored if
-\code{value} is not \code{'auto'}.}
-
-\item{\code{undo()}}{cancels the last job.}
-}}
 

@@ -1,9 +1,64 @@
 
 #' An UCB bandit reference class (RC) object.
 
-#' @field \code{alpha} the linear UCB tuning parameter. See details.
-#' @field \code{family} supported response type. See banditGlmnet for details.
+#' @usage
+#' bandit_ucb(formula, data, family = c("gaussian", "binomial"),
+#'            alpha = 1, contrasts = NULL, newLevels = FALSE,
+#'            db = NULL, path = NULL)
 
+#' @template argBandit
+#' @param alpha the LinUCB tuning parameter. See details.
+#' @template argBanditOpt
+
+#' @details
+#' Let $\hat{y}_{it}$ be the predicted outcome for treatment arm $i$. At each time
+#' period $t$, the LinUCB algorithm selects the experimental arm $i$ that maximizes
+#' $p(i,t) = \hat{y}_i^T \beta_t + \alpha U_t(i)$, where
+#' $U_t(i) = \sqrt{z_i^T\left(X_t^T X_t + \lambda I_K \right)^{-1} z_i}$.
+#' The parameter $\alpha \geq 0$ is a tuning parameter that arbitrates between
+#' exploitation (selecting treatment arms with a high predicted reward $\hat{y}_i$),
+#' and exploration (selecting treatment arms with high uncertainty $U_t(i)$).
+#' The parameter $\lambda > 0$ introduces ridge regularization.
+#'
+#' For modelling, the package currently supports linear, and logistic regressions with
+#' ridge regularization, and allows for a first stage of variable selection using
+#' the LASSO, as well as the automatic selection of tuning parameters using
+#' K-fold cross-validation. All these functionalities are implemented using the
+#' \code{\link[glmnet]{glmnet}} package, wrapped into the new \code{\link{banditGlmnet}} class,
+#' that supports the formula interface.
+
+#' @field alpha the linear UCB tuning parameter. See details.
+#' @field family supported response type. See banditGlmnet for details.
+
+#' @section Methods:
+
+#' \code{train(parRidge = NULL, parLasso = NULL, seed = NULL)} trains the model using
+#' \code{\link{banditGlmnet}} and all completed experiments.
+#' \code{parRidge} and \code{parLasso} are optional lists of
+#' parameters passed to \code{\link{banditGlmnet}} to control the fitting process.
+#' \code{seed} is an optional seeding value for the random number generator.
+#'
+#' \code{tune(param = 'lambdaRidge', value = 'auto', lambdaAuto = 'lambda.1se',
+#' parCvGlmnet = NULL, seed = NULL)} set the value of a tuning parameter of the bandit. \code{param} is either
+#' \code{'lambdaRidge'} (the default) or \code{'lambdaLasso'}. Setting
+#' \code{lambdaLasso} > 0 enables a first stage of variable selection.
+#' \code{value} is either a scalar in [0,1] or 'auto'. If
+#' set to \code{'auto'}, the parameter is picked using \code{\link[glmnet]{cv.glmnet}}.
+#' \code{lambdaAuto} is either \code{'lambda.1se'} or \code{'lambda.min'}
+#' depending on which outcome of \code{\link[glmnet]{cv.glmnet}} should be selected. It
+#' is ignored if \code{value} is not \code{'auto'}. \code{parCvGlmnet} is a list of
+#' parameters passed to \code{\link[glmnet]{cv.glmnet}}. This parameter is ignored if
+#' \code{value} is not \code{'auto'}.
+#'
+#' \code{addSamples(df)} add samples to the bandit. \code{df} is coercible to
+#' a data.frame, and can be appended to the \code{data.frame} used at creation.
+#' In particular, it contains an \code{id} column that is a primary key.
+#'
+#' \code{addOutcomes(y)} add outcomes to the bandit. \code{y} is a named vector
+#' whose names are samples ids.
+#'
+#' \code{undo()} cancel the last job.
+#'
 #' @export bandit_ucb
 #' @exportClass bandit_ucb
 

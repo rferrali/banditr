@@ -4,34 +4,78 @@
 \name{bandit_thompson-class}
 \alias{bandit_thompson-class}
 \alias{bandit_thompson}
+\alias{bandit_stan_lm-class}
+\alias{bandit_stan_lm}
+\alias{bandit_stan_glm-class}
+\alias{bandit_stan_glm}
+\alias{bandit_stan_glmer-class}
+\alias{bandit_stan_glmer}
 \title{A Thompson sampling bandit reference class (RC) object.}
+\usage{
+bandit_stan_lm(formula, data, gamma = 1,
+               contrasts = NULL, newLevels = FALSE,
+               db = NULL, path = NULL)
+bandit_stan_glm(formula, data, family = c("gaussian", "binomial"),
+                gamma = 1, contrasts = NULL, newLevels = FALSE,
+                db = NULL, path = NULL)
+bandit_stan_glmer(formula, data, family = c("gaussian", "binomial"),
+                  gamma = 1, contrasts = NULL, newLevels = FALSE,
+                  db = NULL, path = NULL)
+}
+\arguments{
+\item{formula}{an object of class "formula" (or one that can be coerced
+to that class): a symbolic description of the model that is fitted. The response
+must be named \code{y}}
+
+\item{data}{a data frame (or object coercible by \code{\link{as.data.frame}} to a data frame)
+containing the variables in the model. \code{data} must contain a column named
+\code{id} that uniquely identifies each observation, and a column named \code{y} that
+contains the model response.}
+
+\item{family}{a character string describing the error distribtion and link function
+to be used in the model. Can be either \code{"binomial"} or \code{"gaussian"} (the default).}
+
+\item{gamma}{the Thompson sampling tuning parameter. See details.}
+
+\item{contrasts}{an optional list. See the \code{contrasts.arg} of \code{model.matrix.default}.}
+
+\item{newLevels}{a logical value indicating whether to allow for new factor levels when
+adding samples. Default is FALSE.}
+
+\item{db}{an optional named list of arguments passed to \code{\link[RODBC]{odbcDriverConnect}}.}
+
+\item{path}{an optional character string naming a folder open for writing.}
+}
 \description{
 A Thompson sampling bandit reference class (RC) object.
+}
+\details{
+abc
 }
 \section{Fields}{
 
 \describe{
-\item{\code{\code{gamma}}}{the blabla tuning parameter. See details.}
+\item{\code{gamma}}{the Thompson sampling tuning parameter.}
 }}
+
 
 \section{Methods}{
 
-\describe{
-\item{\code{initialize(formula, data, family, contrasts = NULL, newLevels = FALSE,
-  db = NULL, path = NULL, ...)}}{initialization function}
 
-\item{\code{train(FUN, args, seed)}}{train the bandit using available samples and latest values of the tuning
-parameters.}
+\code{train(..., seed = NULL)} trains the model using the relevant function from
+\code{\link{[rstanarm]rstanarm}} and all completed experiments. \code{...} are
+additional parameters passed on to the relevant function in \code{rstanarm}.
+\code{seed} is an optional seeding value for the random number generator.
 
-\item{\code{tune(FUN, args, seed)}}{set the value of a tuning parameter of the bandit. \code{param} is either
-\code{'lambdaRidge'} (the default) or \code{'lambdaLasso'}. Setting
-\code{lambdaLasso} > 0 enables a first stage of variable selection.
-\code{value} is either a scalar in [0,1] or 'auto'. If
-set to \code{'auto'}, the parameter is picked using \code{\link[glmnet]{cv.glmnet}}.
-\code{lambdaAuto} is either \code{'lambda.1se'} or \code{'lambda.min'}
-depending on which outcome of \code{\link[glmnet]{cv.glmnet}} should be selected. It
-is ignored if \code{value} is not \code{'auto'}. \code{parCvGlmnet} is a list of
-parameters passed to \code{\link[glmnet]{cv.glmnet}}. This parameter is ignored if
-\code{value} is not \code{'auto'}.}
-}}
+\code{tune()} currently not supported.
+
+\code{addSamples(df)} add samples to the bandit. \code{df} is coercible to
+a data.frame, and can be appended to the \code{data.frame} used at creation.
+In particular, it contains an \code{id} column that is a primary key.
+
+\code{addOutcomes(y)} add outcomes to the bandit. \code{y} is a named vector
+whose names are samples ids.
+
+\code{undo()} cancels the last job.
+}
 

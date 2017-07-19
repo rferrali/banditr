@@ -1,6 +1,41 @@
 #' A Thompson sampling bandit reference class (RC) object.
 
-#' @field \code{gamma} the blabla tuning parameter. See details.
+#' @usage
+#' bandit_stan_lm(formula, data, gamma = 1,
+#'                contrasts = NULL, newLevels = FALSE,
+#'                db = NULL, path = NULL)
+#' bandit_stan_glm(formula, data, family = c("gaussian", "binomial"),
+#'                 gamma = 1, contrasts = NULL, newLevels = FALSE,
+#'                 db = NULL, path = NULL)
+#' bandit_stan_glmer(formula, data, family = c("gaussian", "binomial"),
+#'                   gamma = 1, contrasts = NULL, newLevels = FALSE,
+#'                   db = NULL, path = NULL)
+#' @template argBandit
+#' @param gamma the Thompson sampling tuning parameter. See details.
+#' @template argBanditOpt
+#' @details
+#'
+#' abc
+#'
+#' @field gamma the Thompson sampling tuning parameter.
+#'
+#' @section Methods:
+#'
+#' \code{train(..., seed = NULL)} train the model using the relevant function from
+#' \code{\link{[rstanarm]rstanarm}} and all completed experiments. \code{...} are
+#' additional parameters passed on to the relevant function in \code{rstanarm}.
+#' \code{seed} is an optional seeding value for the random number generator.
+#'
+#' \code{tune()} currently not supported.
+#'
+#' \code{addSamples(df)} add samples to the bandit. \code{df} is coercible to
+#' a data.frame, and can be appended to the \code{data.frame} used at creation.
+#' In particular, it contains an \code{id} column that is a primary key.
+#'
+#' \code{addOutcomes(y)} add outcomes to the bandit. \code{y} is a named vector
+#' whose names are samples ids.
+#'
+#' \code{undo()} cancel the last job.
 
 bandit_thompson <- setRefClass("bandit_thompson",
                          contains = "bandit",
@@ -29,9 +64,9 @@ bandit_thompson$methods(
   })
 
 
+#' @rdname bandit_thompson-class
 #' @export bandit_stan_lm
 #' @exportClass bandit_stan_lm
-
 
 bandit_stan_lm <- setRefClass("bandit_stan_lm",
                               contains = "bandit_thompson")
@@ -53,6 +88,7 @@ bandit_stan_lm$methods(
   }
 )
 
+#' @rdname bandit_thompson-class
 #' @export bandit_stan_glm
 #' @exportClass bandit_stan_glm
 
@@ -82,6 +118,7 @@ bandit_stan_glm$methods(
   }
 )
 
+#' @rdname bandit_thompson-class
 #' @export bandit_stan_glmer
 #' @exportClass bandit_stan_glmer
 

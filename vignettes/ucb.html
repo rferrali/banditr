@@ -12,7 +12,7 @@
 
 <meta name="author" content="Romain Ferrali" />
 
-<meta name="date" content="2017-07-18" />
+<meta name="date" content="2017-07-19" />
 
 <title>LinUCB bandits</title>
 
@@ -70,15 +70,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">LinUCB bandits</h1>
 <h4 class="author"><em>Romain Ferrali</em></h4>
-<h4 class="date"><em>2017-07-18</em></h4>
+<h4 class="date"><em>2017-07-19</em></h4>
 
 
 
-<p>The introductory vignette showed how to manage bandit objects with the <code>banditr</code> package. This vignette details the specifics of how <code>banditr</code> manages Linear Upper Confidence Bounds (LinUCB, ) bandit algorithms.</p>
-<div id="vignette-info" class="section level2">
-<h2>Vignette Info</h2>
-<p>Note the various macros within the <code>vignette</code> section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the <code>title</code> field and the <code>\VignetteIndexEntry</code> to match the title of your vignette.</p>
-</div>
+<p>The introductory vignette gives a short introduction to bandit algorithms, and their implementation in the <code>banditr</code> package. This vignette details the specifics of how <code>banditr</code> handles Linear Upper Confidence Bounds (LinUCB, <span class="citation">(Li et al. 2010)</span>) bandit algorithms.</p>
+<p>Let <span class="math inline">\(\hat{y}_{it}\)</span> be the predicted outcome for treatment arm <span class="math inline">\(i\)</span>. At each time period <span class="math inline">\(t\)</span>, the LinUCB algorithm selects the experimental arm <span class="math inline">\(i\)</span> that maximizes <span class="math inline">\(p(i,t) = \hat{y}_i^T \beta_t + \alpha U_t(i)\)</span>, where <span class="math inline">\(U_t(i) = \sqrt{z_i^T\left(X_t^T X_t + \lambda I_K \right)^{-1} z_i}\)</span>. The parameter <span class="math inline">\(\alpha \geq 0\)</span> is a tuning parameter that arbitrates between exploitation (selecting treatment arms with a high predicted reward <span class="math inline">\(\hat{y}_i\)</span>), and exploration (selecting treatment arms with high uncertainty <span class="math inline">\(U_t(i)\)</span>). The parameter <span class="math inline">\(\lambda &gt; 0\)</span> introduces ridge regularization.</p>
+<p>For modelling, the package currently supports linear, and logistic regressions with ridge regularization, and allows for a first stage of variable selection using the LASSO, as well as the automatic selection of tuning parameters using <span class="math inline">\(K-fold\)</span> cross-validation. All these functionalities are implemented using the <code>glmnet</code> package, wrapped into the new <code>banditGlmnet</code> class, that supports the formula interface.</p>
 <div id="styles" class="section level2">
 <h2>Styles</h2>
 <p>The <code>html_vignette</code> template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:</p>
@@ -265,6 +263,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <blockquote>
 <p>“He who gives up [code] safety for [code] speed deserves neither.” (<a href="https://twitter.com/hadleywickham/status/504368538874703872">via</a>)</p>
 </blockquote>
+<div id="refs" class="references">
+<div id="ref-Li2010a">
+<p>Li, Lihong, Wei Chu, John Langford, and Robert E. Schapire. 2010. “A Contextual-Bandit Approach to Personalized News Article Recommendation.” In <em>WWW ’10 Proceedings of the 19th International Conference on World Wide Web</em>, 661–70. Railegh, NC: ACM. doi:<a href="https://doi.org/10.1145/1772690.1772758">10.1145/1772690.1772758</a>.</p>
+</div>
+</div>
 </div>
 <div class="footnotes">
 <hr />

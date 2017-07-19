@@ -1,16 +1,19 @@
 
 #' A bandit reference class (RC) object.
 
-#' @field \code{formula} an object of class "formula" (or one that can be coerced
+
+#' @template argBandit
+#' @template argBanditOpt
+#' @field formula an object of class "formula" (or one that can be coerced
 #' to that class): a symbolic description of the model that is fitted.
-#' @field \code{contrasts} an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.
-#' @field \code{newLevels} a logical value indicating whether to allow for new factor levels when adding samples.  (where relevant) a record of the levels of the factors used in fitting.
-#' @field \code{xlevels} if \code{newLevels} is false, a record of the levels of the factors used in fitting.
-#' @field \code{currentJob} a numeric with the id of the current job.
-#' @field \code{currentModel} the prototype of the latest fit.
-#' @field \code{currentParams} a list of tuning parameters.
-#' @field \code{banditData} the bandit's data.
-#' @field \code{statistics} dunno
+#' @field contrasts an optional list. See the \code{contrasts.arg} of \code{\link{model.matrix.default}}.
+#' @field newLevels a logical value indicating whether to allow for new factor levels when adding samples.
+#' @field xlevels if \code{newLevels} is false, a record of the levels of the factors used in fitting.
+#' @field currentJob a numeric with the id of the current job.
+#' @field currentModel the prototype of the latest fit.
+#' @field currentParams a list of tuning parameters.
+#' @field banditData the bandit's data.
+#' @field statistics a character vector of statistics to be computed when adding outcomes
 #' @import methods
 
 
@@ -28,11 +31,12 @@ bandit <- setRefClass("bandit",
                                     statistics = "character"))
 
 bandit$methods(
-  initialize = function(formula, data, family, contrasts = NULL, newLevels = FALSE,
+  initialize = function(formula, data, family,
+                        contrasts = NULL,
+                        newLevels = FALSE,
                         db = NULL,
                         path = NULL,
                         ...) {
-    "initialization function"
     isDf <- TRUE
     if(!is.null(db) & !is.null(path)) isDf <- FALSE
     data <- validateData(data)
@@ -60,9 +64,6 @@ bandit$methods(
                currentModel = NULL)
   },
   addSamples = function(df) {
-    "add samples to the bandit. \\code{df} is coercible to a data.frame, and can be appended
-    to the \\code{data.frame} used at creation. In particular, it contains an \\code{id} column
-    that is a primary key."
 
     df <- as.data.frame(df)
     df$jobSamples <- currentJob+1
@@ -75,7 +76,6 @@ bandit$methods(
     currentJob <<- currentJob + 1
   },
   addOutcomes = function(y, ...) {
-    "add outcomes to the bandit. y is a named vector whose names are samples ids."
 
     if(is.null(names(y))) stop("y must be a named vector")
     if(any(is.na(y))) warning("some outcomes you are adding have NA's")
@@ -103,8 +103,6 @@ bandit$methods(
     currentJob <<- currentJob + 1
   },
   train = function(FUN, args, seed) {
-    "train the bandit using available samples and latest values of the tuning
-    parameters."
     args$data <- args$formula <- args$contrats <- args$seed <- NULL
     data <- rSamples(banditData, what = "current")
     data$jobSamples <- data$jobOutcome <- NULL
@@ -133,17 +131,6 @@ bandit$methods(
     currentJob <<- currentJob + 1
   },
   tune = function(FUN, args, seed) {
-    "set the value of a tuning parameter of the bandit. \\code{param} is either
-    \\code{'lambdaRidge'} (the default) or \\code{'lambdaLasso'}. Setting
-    \\code{lambdaLasso} > 0 enables a first stage of variable selection.
-    \\code{value} is either a scalar in [0,1] or 'auto'. If
-    set to \\code{'auto'}, the parameter is picked using \\code{\\link[glmnet]{cv.glmnet}}.
-    \\code{lambdaAuto} is either \\code{'lambda.1se'} or \\code{'lambda.min'}
-    depending on which outcome of \\code{\\link[glmnet]{cv.glmnet}} should be selected. It
-    is ignored if \\code{value} is not \\code{'auto'}. \\code{parCvGlmnet} is a list of
-    parameters passed to \\code{\\link[glmnet]{cv.glmnet}}. This parameter is ignored if
-    \\code{value} is not \\code{'auto'}."
-
     data <- rSamples(banditData, what = "current")
     args <- c(args,
               list(formula = formula,
@@ -157,7 +144,6 @@ bandit$methods(
     currentJob <<- currentJob + 1
   },
   undo = function() {
-    "cancels the last job."
     lastJob <- rJobs(banditData, "last")
     type <- lastJob$type
     banditData <<- dJobs(banditData)
