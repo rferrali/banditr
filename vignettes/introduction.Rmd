@@ -21,11 +21,7 @@ The `banditr` package implements several popular algorithms that solve the multi
 
 The `banditr` package provides a comprehensive solution that handles the entire experimental sequence. Because such sequential experiments may involve large amounts of data, the package allows storing its data locally, as a self-contained R object, but also remotely, using the host's filesystem and a database management system (DBMS). Currently, the package supports one DBMS: Microsoft SQL Server, through the [`RODBC`](https://cran.r-project.org/web/packages/RODBC/index.html) package. 
 
-This vignette gives an overview of how `banditr` handles `bandit` objects, using a LinUCB bandit as an example. Other vignettes detail: 
-
-* How to use `banditr` with a DBMS
-* Specifics of LinUCB bandits
-* Specifics of Thompson sampling bandits
+This vignette gives an overview of how `banditr` handles `bandit` objects, using a LinUCB bandit as an example. Another vignette details how to use `banditr` with a DBMS. 
 
 ## Bandit algorithms
 
@@ -40,6 +36,22 @@ Bandit algorithms implement mechanisms to solve this maximization problem. Suppo
 * $Y_t \leftarrow (Y_{t-1}, y_i), X_t \leftarrow (X_{t-1}, z_i^T)$
 * Update the model parameters $\hat{\beta}_t$ by estimating the model $Y_t = X_t \beta$. 
 * Select the treatment arm $i = f(\beta_t, Z_t)$
+
+### Specifics of LinUCB
+
+Let $\hat{y}_{it}$ be the predicted outcome for treatment arm $i$. At each time period $t$, the LinUCB algorithm selects the experimental arm $i$ that maximizes $p(i,t) = \hat{y}_i^T \beta_t + \alpha U_t(i)$, where $U_t(i) = \sqrt{z_i^T\left(X_t^T X_t + \lambda I_K \right)^{-1} z_i}$. The parameter $\alpha \geq 0$ is a tuning parameter that arbitrates between exploitation (selecting treatment arms with a high predicted reward $\hat{y}_i$), and exploration (selecting treatment arms with high uncertainty $U_t(i)$). The parameter $\lambda > 0$ introduces ridge regularization. 
+
+For modelling, the package currently supports linear, and logistic regressions with ridge regularization, and allows for a first stage of variable selection using the LASSO, as well as the automatic selection of tuning parameters using $K-fold$ cross-validation. All these functionalities are implemented using the `glmnet` package, wrapped into the new `banditGlmnet` class, that supports the formula interface. 
+
+### Specifics of Thompson sampling
+
+The Thomspon sampling algorithm operate in a Bayesian framework. At each time period, the algorithm selects the next experimental arm at random, with a weight that is a function of the posterior expected predicted probability of maximizing the reward. Let $\hat{y}_{it}(\beta)$ be the predicted outcome for treatment arm $i$ at time $t$ for parameters $\beta$, and define $I_{it}(\beta) = 1$ if treatment arm $i$ solves $\max_{i \in (1, ..., Z_t)} \hat{y}_{it}(\beta)$, and $I_{it}(\beta) = 0$ otherwise. Then the Thompson sampling weights for arm $i$ at time $t$ can be estimated with the following: 
+$$
+w_{it} = \frac{1}{M} \sum_{m=1}^M I_{it}(\beta^{(m)}), 
+$$
+where $\beta^{(m)}$ is the $m$-th draw from the posterior distribution at time $t$. The equation basically defines weights as the proportion of posterior draws for which $i$ is maximal. One can set the amount of exploration by sampling according to some weight $w_{it}^\gamma$, where the algorithm will tend to explore more for $\gamma < 1$, and exploit more for $\gamma > 1$. 
+
+For modelling, the package currently supports linear, and logistic regressions, as well as random effect models. Estimation is conducted using the `rstanarm` package. 
 
 ## Creating a bandit object
 

@@ -1,19 +1,25 @@
 
 #' Estimate a banditGlmnet model
 #'
+#' The syntax follows closely that of \code{\link[stats]{glm}}.
+#' All parameters not defined on this page are defined as in
+#' \code{\link[stats]{glm}}.
+#'
+#'
 #' @export
-#' @param formula an object of class "formula" (or one that can be coerced
-#' to that class): a symbolic description of the model to be fitted.
-#' @param family supported response type
+#' @param family supported response type. Currently, either
+#' \code{"gaussian"} (the default) or \code{"binomial"}.
 #' @param lambdaRidge a scalar in [0,1]. Tuning parameter of the ridge regression.
 #' @param lambdaLasso a scalar in [0,1]. Tuning parameter of the LASSO.
-#' @param data a data frame, list or environment (or object coercible by as.data.frame
-#' to a data frame) containing the variables in the model.
 #' @param seed an (optional) seeding number.
 #' @param parRidge an (optional) list of parameters passed on to glmnet for the ridge
 #' stage. Format argument = value.
 #' @param parLasso an (optional) list of parameters passed on to glmnet for the LASSO
-#' stage. Format argument = value.
+#' stage. Format argument = value
+#' @param method the method to be used in fitting the model.
+#' The default \code{"glmnet"} uses \code{\link[glmnet]{glmnet}};
+#' the alternative \code{"model.frame"} returns the model frame and does
+#' no fitting.
 #' @return a banditGlmnet object.
 
 

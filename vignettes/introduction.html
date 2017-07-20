@@ -12,7 +12,7 @@
 
 <meta name="author" content="Romain Ferrali" />
 
-<meta name="date" content="2017-07-19" />
+<meta name="date" content="2017-07-20" />
 
 <title>Introduction to banditr</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Introduction to <code>banditr</code></h1>
 <h4 class="author"><em>Romain Ferrali</em></h4>
-<h4 class="date"><em>2017-07-19</em></h4>
+<h4 class="date"><em>2017-07-20</em></h4>
 
 
 
@@ -84,12 +84,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>Linear Upper Confidence Bound <span class="citation">(LinUCB, Li et al. 2010)</span>, with optional dimensionality reduction (Egami &amp; Imai ???), using the <a href="https://cran.r-project.org/web/packages/glmnet/index.html"><code>glmnet</code></a> package.</li>
 </ul>
 <p>The <code>banditr</code> package provides a comprehensive solution that handles the entire experimental sequence. Because such sequential experiments may involve large amounts of data, the package allows storing its data locally, as a self-contained R object, but also remotely, using the host’s filesystem and a database management system (DBMS). Currently, the package supports one DBMS: Microsoft SQL Server, through the <a href="https://cran.r-project.org/web/packages/RODBC/index.html"><code>RODBC</code></a> package.</p>
-<p>This vignette gives an overview of how <code>banditr</code> handles <code>bandit</code> objects, using a LinUCB bandit as an example. Other vignettes detail:</p>
-<ul>
-<li>How to use <code>banditr</code> with a DBMS</li>
-<li>Specifics of LinUCB bandits</li>
-<li>Specifics of Thompson sampling bandits</li>
-</ul>
+<p>This vignette gives an overview of how <code>banditr</code> handles <code>bandit</code> objects, using a LinUCB bandit as an example. Another vignette details how to use <code>banditr</code> with a DBMS.</p>
 <div id="bandit-algorithms" class="section level2">
 <h2>Bandit algorithms</h2>
 <p>In the multi-armed bandit problem, the experimenter starts with <span class="math inline">\(N_0\)</span> completed experiments for which she observes the vector of outcomes <span class="math inline">\(Y_0\)</span>, and the <span class="math inline">\(N_0 \times K\)</span> matrix <span class="math inline">\(X_0\)</span> of features. She has an <span class="math inline">\(R_0 \times K\)</span> matrix <span class="math inline">\(Z\)</span> of characteristics for treatment arms for which she does not observe the outcome. At each time period <span class="math inline">\(t\)</span>, she selects a treatment arm <span class="math inline">\(i\)</span> for which she observes the outcome <span class="math inline">\(y_i\)</span>. Her goal is to solve the following maximization problem: <span class="math display">\[
@@ -102,6 +97,18 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>Update the model parameters <span class="math inline">\(\hat{\beta}_t\)</span> by estimating the model <span class="math inline">\(Y_t = X_t \beta\)</span>.</li>
 <li>Select the treatment arm <span class="math inline">\(i = f(\beta_t, Z_t)\)</span></li>
 </ul>
+<div id="specifics-of-linucb" class="section level3">
+<h3>Specifics of LinUCB</h3>
+<p>Let <span class="math inline">\(\hat{y}_{it}\)</span> be the predicted outcome for treatment arm <span class="math inline">\(i\)</span>. At each time period <span class="math inline">\(t\)</span>, the LinUCB algorithm selects the experimental arm <span class="math inline">\(i\)</span> that maximizes <span class="math inline">\(p(i,t) = \hat{y}_i^T \beta_t + \alpha U_t(i)\)</span>, where <span class="math inline">\(U_t(i) = \sqrt{z_i^T\left(X_t^T X_t + \lambda I_K \right)^{-1} z_i}\)</span>. The parameter <span class="math inline">\(\alpha \geq 0\)</span> is a tuning parameter that arbitrates between exploitation (selecting treatment arms with a high predicted reward <span class="math inline">\(\hat{y}_i\)</span>), and exploration (selecting treatment arms with high uncertainty <span class="math inline">\(U_t(i)\)</span>). The parameter <span class="math inline">\(\lambda &gt; 0\)</span> introduces ridge regularization.</p>
+<p>For modelling, the package currently supports linear, and logistic regressions with ridge regularization, and allows for a first stage of variable selection using the LASSO, as well as the automatic selection of tuning parameters using <span class="math inline">\(K-fold\)</span> cross-validation. All these functionalities are implemented using the <code>glmnet</code> package, wrapped into the new <code>banditGlmnet</code> class, that supports the formula interface.</p>
+</div>
+<div id="specifics-of-thompson-sampling" class="section level3">
+<h3>Specifics of Thompson sampling</h3>
+<p>The Thomspon sampling algorithm operate in a Bayesian framework. At each time period, the algorithm selects the next experimental arm at random, with a weight that is a function of the posterior expected predicted probability of maximizing the reward. Let <span class="math inline">\(\hat{y}_{it}(\beta)\)</span> be the predicted outcome for treatment arm <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span> for parameters <span class="math inline">\(\beta\)</span>, and define <span class="math inline">\(I_{it}(\beta) = 1\)</span> if treatment arm <span class="math inline">\(i\)</span> solves <span class="math inline">\(\max_{i \in (1, ..., Z_t)} \hat{y}_{it}(\beta)\)</span>, and <span class="math inline">\(I_{it}(\beta) = 0\)</span> otherwise. Then the Thompson sampling weights for arm <span class="math inline">\(i\)</span> at time <span class="math inline">\(t\)</span> can be estimated with the following: <span class="math display">\[
+w_{it} = \frac{1}{M} \sum_{m=1}^M I_{it}(\beta^{(m)}), 
+\]</span> where <span class="math inline">\(\beta^{(m)}\)</span> is the <span class="math inline">\(m\)</span>-th draw from the posterior distribution at time <span class="math inline">\(t\)</span>. The equation basically defines weights as the proportion of posterior draws for which <span class="math inline">\(i\)</span> is maximal. One can set the amount of exploration by sampling according to some weight <span class="math inline">\(w_{it}^\gamma\)</span>, where the algorithm will tend to explore more for <span class="math inline">\(\gamma &lt; 1\)</span>, and exploit more for <span class="math inline">\(\gamma &gt; 1\)</span>.</p>
+<p>For modelling, the package currently supports linear, and logistic regressions, as well as random effect models. Estimation is conducted using the <code>rstanarm</code> package.</p>
+</div>
 </div>
 <div id="creating-a-bandit-object" class="section level2">
 <h2>Creating a bandit object</h2>
@@ -127,7 +134,7 @@ bdt &lt;-<span class="st"> </span><span class="kw">bandit_ucb</span>(<span class
                   <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>, 
                   <span class="dt">data =</span> start)
 <span class="kw">summary</span>(bdt)</code></pre></div>
-<pre><code>## Bandit started 2017-07-19 10:47:13
+<pre><code>## Bandit started 2017-07-20 13:19:23
 ## Formula: y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10
 ## 
 ## Family: 
@@ -143,14 +150,14 @@ bdt &lt;-<span class="st"> </span><span class="kw">bandit_ucb</span>(<span class
 ## 
 ## Last jobs:
 ##  job                date       type param value
-##    1 2017-07-19 10:47:13 initialize    NA    NA</code></pre>
+##    1 2017-07-20 13:19:23 initialize    NA    NA</code></pre>
 </div>
 <div id="managing-the-experiment" class="section level2">
 <h2>Managing the experiment</h2>
 <p>The user manages the experiment by performing jobs on the bandit. First, let’s update the model using our current training set.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bdt$<span class="kw">train</span>()
 <span class="kw">summary</span>(bdt)</code></pre></div>
-<pre><code>## Bandit started 2017-07-19 10:47:13
+<pre><code>## Bandit started 2017-07-20 13:19:23
 ## Formula: y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10
 ## 
 ## Family: 
@@ -169,8 +176,8 @@ bdt &lt;-<span class="st"> </span><span class="kw">bandit_ucb</span>(<span class
 ## 
 ## Last jobs:
 ##  job                date       type param value
-##    1 2017-07-19 10:47:13 initialize    NA    NA
-##    2 2017-07-19 10:47:13      train    NA    NA</code></pre>
+##    1 2017-07-20 13:19:23 initialize    NA    NA
+##    2 2017-07-20 13:19:23      train    NA    NA</code></pre>
 <p>We then add experimental arms to the bandit, and obtain their score, as per the LinUCB algorithm:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">add &lt;-<span class="st"> </span>df[<span class="dv">101</span>:<span class="dv">1000</span>,]
 add$y &lt;-<span class="st"> </span><span class="ot">NA</span> <span class="co"># let's pretend we haven't observed the reward yet. </span>

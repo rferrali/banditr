@@ -1,6 +1,24 @@
+
+
+#' Plot diagnostics for a bandit object
+#'
+#' Two plots (selectable by \code{what}) are currently available: a plot of the reward
+#' over time, and a plot of model coefficients over time.
+#'
+#' @param x an object inheriting from class \code{"bandit"}
+#' @param what the type of plot. Either \code{"reward"} (the default) or \code{"coef"}.
+#' @param ... additional arguments passed to the plotting function.
+#'
+#' @details
+#' The \code{plot.bandit} method calls other plotting functions as specified by the
+#' parameter \code{what}. All plotting functions are prefixed with \code{"plot"}, and
+#' have a \code{data} parameter that returns the raw data used for plotting when
+#' set to \code{TRUE}.
+#' @seealso \code{\link{plotReward}}, \code{\link{plotCoef}}
+
+
 #' @include banditUcb.R
 #' @include banditThompson.R
-
 #' @export
 
 plot.bandit <- function(x, what = "reward", ...) {
@@ -15,7 +33,8 @@ plot.bandit <- function(x, what = "reward", ...) {
 setMethod("plot", signature(x = "bandit"), plot.bandit)
 #' @export
 setMethod("plot", signature(x = "bandit_ucb"), function(x, what = "reward", ...) {
-  what <- match.arg(what, c("reward", "uncertainty", "MSE", "tuning", "coef"))
+  what <- match.arg(what, c("reward", "coef"))
+  # what <- match.arg(what, c("reward", "uncertainty", "MSE", "tuning", "coef"))
   callNextMethod()
 })
 #' @export
@@ -24,7 +43,17 @@ setMethod("plot", signature(x = "bandit_thompson"), function(x, what = "reward",
   callNextMethod()
 })
 
-
+#' Plot the reward of a bandit object
+#'
+#' @param object an object inheriting from class \code{"bandit"}
+#' @param data logical: should the raw plot data be returned?
+#' @param cumulative logical: should the cumulative reward be plotted?
+#' @param expectedReward logical: should the expected reward be plotted?
+#' @param maxReward logical: should the maximum reward be plotted? (only supported for
+#' binomial models).
+#' @param ... additional parameters passed to \code{\link[graphics]{plot.default}}
+#'
+#' @export
 
 plotReward <- function(object, data = FALSE, cumulative = TRUE, expectedReward = TRUE, maxReward, ...) {
 
@@ -68,6 +97,14 @@ plotReward <- function(object, data = FALSE, cumulative = TRUE, expectedReward =
   legend("topleft", legend = legendLab, lty = legendLty)
 }
 
+#' Plot the reward of a bandit object
+#'
+#' @param object an object inheriting from class \code{"bandit"}
+#' @param data logical: should the raw plot data be returned?
+#' @param ... additional parameters passed to \code{\link[graphics]{plot.default}}
+#'
+#' @export
+
 plotCoef <- function(object, data = FALSE, ...) {
   m <- coef.bandit(object, what = "all")
   if(data) return(m)
@@ -76,8 +113,8 @@ plotCoef <- function(object, data = FALSE, ...) {
   m <- m[order(m[,ncol(m)]),]
   palette <- rainbow(nrow(m))
   plot(x = 1:ncol(m), y = m[1,], type = "l", col = palette[1],
-       ylim = ylim, xaxt = "n", xlab = "Job", ylab = "Coefficient value")
-  text(ncol(m), m[,ncol(m)], labels = rownames(m), offset = 1, pos = 2, col = palette, ...)
+       ylim = ylim, xaxt = "n", xlab = "Job", ylab = "Coefficient value", ...)
+  text(ncol(m), m[,ncol(m)], labels = rownames(m), offset = 1, pos = 2, col = palette)
   if(nrow(m) > 1) {
     for(i in 2:nrow(m)) {
       lines(x = 1:ncol(m), y = m[i,], col = palette[i])

@@ -1,3 +1,26 @@
+
+#'  Extract quantities from a bandit object
+#'
+#' @param object an object inheriting from class \code{"bandit"}
+#' @param what the specific object to select. See details.
+#'
+#' @details
+#' By default, \code{getSamples} extracts all samples
+#' with a non-missing outcome. Alternatives are \code{"last"},
+#' for the samples used in the last training job; \code{"remaining"} for all samples
+#' with a missing outcome.
+#'
+#' By default, \code{getJobs} extracts a summary of all jobs done by the bandit. The
+#' alternative \code{"last"} extracts a summary of the last job done by the bandit.
+#'
+#' By default, \code{getModel} extracts the model estimated at the last training job.
+#' The id of a training job may be supplied.
+#'
+#' @return
+#' For \code{getSamples} and \code{getJobs}, a \code{data.frame}. For \code{getModel},
+#' a model object.
+
+
 #' @include banditUcb.R
 #' @include banditThompson.R
 
@@ -8,7 +31,7 @@ getSamples <- function(object, what = "current") {
   rSamples(object$banditData, what)
 }
 
-
+#' @rdname getSamples
 #' @export
 getJobs <- function(object, what = "all") {
   what <- match.arg(what, c("last", "all"))
@@ -25,7 +48,7 @@ getModel.bandit <- function(object, what = "last") {
     what <- as.numeric(what)
     if(is.na(what)) stop("use a correct job id.")
     jobs <- rJobs(object$banditData, "all")
-    if(!what %in% jobs$job[jobs$type == "train"]) stop("the selectd id does not match any training job.")
+    if(!what %in% jobs$job[jobs$type == "train"]) stop("the selected id does not match any training job.")
     model <- rTrain(object$banditData, what)
     data <- rSamples(object$banditData, paste0("job", what))
   }
@@ -84,7 +107,7 @@ getModel.bandit_stan_glmer <- function(object, what = "last") {
   addCall(m, FUN = "stan_glmer")
 }
 
-
+#' @rdname getSamples
 #' @export
 setGeneric("getModel", function(object, what = "last") {})
 #' @export

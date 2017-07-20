@@ -1,11 +1,57 @@
+
+
+#' Predict Method for bandit objects
+#'
+#' Obtains predictions from a bandit object.
+#'
+#' @usage
+#' predict.bandit_ucb(object,
+#'                    whatSamples = "remaining",
+#'                    whatModel = "last",
+#'                    type = c("response", "uncertainty", "score"),
+#'                    robust = TRUE)
+#' predict.bandit_thompson(object,
+#'                         whatSamples = "remaining",
+#'                         whatModel = "last",
+#'                         type = c("response","weight"),
+#'                         re.form = NULL)
+#' @param object an object inheriting from class \code{"bandit"}
+#' @param whatSamples the samples with which to predict. The default is all samples
+#' with a missing outcome. .
+#' Alternatives are \code{"current"}, for all samples with a non-missing outcome; \code{"last"},
+#' for the samples used in the last training job; \code{"job\%i"}, for samples added
+#' in job \code{"\%i"}; or a numeric vector of samples ids.
+#' @param whatModel the fitted model with which to predict. The default uses the last
+#' fitted model; alternatively, the job id of a training job can be supplied.
+#' @param type the type of prediction required. See Details.
+#' @param robust logical switch indicating whether generalized Moore-Penrose inverse
+#' should be used if regular inversion fails when computing uncertainty.
+#' @param re.form same as \code{re.form} in \link[rstanarm]{posterior_predict.stanreg}.
+#'
+#' @details
+#' The \code{predict} method predictions using some model in
+#' the bandit. It is used to select the next experimental arm.
+#' For all methods, the \code{type} parameter may take values \code{"link"} and
+#' \code{"response"}, for predictions on the scale of the linear predictors, and
+#' on the scale of the response variable respectively. Thus, for a default binomial
+#' model, \code{type = "response"} returns log-odds, while \code{type = "link"} returns
+#' predicted probabilities.
+#'
+#' Objects of class \code{"bandit_ucb"} also support types
+#' \code{"uncertainty"}, and \code{"score"}. Uncertainty is used to compute the score,
+#' with score = response + alpha uncertainty.
+#'
+#' Objects of class \code{"bandit_thompson"} also support type \code{"weight"}, the
+#' Thompson sampling weights.
+#'
+#' @return
+#' If the \code{type} parameter has length 1, a vector of predictions.
+#' Otherwise, a data frame of predictions.
+#'
 #' @include banditUcb.R
 #' @include banditThompson.R
-
-
-#' @export
 #' @import glmnet
-
-
+#' @export
 predict.bandit <- function(object,
                            whatSamples = "remaining",
                            whatModel = "last",

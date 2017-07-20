@@ -1,7 +1,14 @@
+
+
+#' Extract coefficients from a bandit object
+#' @param object an object inheriting from class \code{"bandit"}
+#' @param what either \code{"last"} (the default) for the coefficients of the model estimated
+#' in the last training job, or \code{"all"} for the coefficients of all
+#' training jobs.
+#' @return a numeric vector if \code{what = "last"}; a matrix if \code{what = "all"}.
+
 #' @include banditUcb.R
 #' @include banditThompson.R
-
-
 #' @export
 
 coef.bandit <- function(object, what = "last") {

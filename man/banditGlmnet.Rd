@@ -10,17 +10,12 @@ banditGlmnet(formula, family = c("gaussian", "binomial"), lambdaRidge,
   x = FALSE, y = TRUE, contrasts = NULL)
 }
 \arguments{
-\item{formula}{an object of class "formula" (or one that can be coerced
-to that class): a symbolic description of the model to be fitted.}
-
-\item{family}{supported response type}
+\item{family}{supported response type. Currently, either
+\code{"gaussian"} (the default) or \code{"binomial"}.}
 
 \item{lambdaRidge}{a scalar in [0,1]. Tuning parameter of the ridge regression.}
 
 \item{lambdaLasso}{a scalar in [0,1]. Tuning parameter of the LASSO.}
-
-\item{data}{a data frame, list or environment (or object coercible by as.data.frame
-to a data frame) containing the variables in the model.}
 
 \item{seed}{an (optional) seeding number.}
 
@@ -28,11 +23,18 @@ to a data frame) containing the variables in the model.}
 stage. Format argument = value.}
 
 \item{parLasso}{an (optional) list of parameters passed on to glmnet for the LASSO
-stage. Format argument = value.}
+stage. Format argument = value}
+
+\item{method}{the method to be used in fitting the model.
+The default \code{"glmnet"} uses \code{\link[glmnet]{glmnet}};
+the alternative \code{"model.frame"} returns the model frame and does
+no fitting.}
 }
 \value{
 a banditGlmnet object.
 }
 \description{
-Estimate a banditGlmnet model
+The syntax follows closely that of \code{\link[stats]{glm}}.
+All parameters not defined on this page are defined as in
+\code{\link[stats]{glm}}.
 }

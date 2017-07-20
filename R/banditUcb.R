@@ -7,28 +7,15 @@
 #'            db = NULL, path = NULL)
 
 #' @template argBandit
-#' @param alpha the LinUCB tuning parameter. See details.
+#' @param alpha the LinUCB tuning parameter. A positive scalar. Higher values of
+#' \code{alpha} favor exploration over exploitation.
 #' @template argBanditOpt
 
 #' @details
-#' Let $\hat{y}_{it}$ be the predicted outcome for treatment arm $i$. At each time
-#' period $t$, the LinUCB algorithm selects the experimental arm $i$ that maximizes
-#' $p(i,t) = \hat{y}_i^T \beta_t + \alpha U_t(i)$, where
-#' $U_t(i) = \sqrt{z_i^T\left(X_t^T X_t + \lambda I_K \right)^{-1} z_i}$.
-#' The parameter $\alpha \geq 0$ is a tuning parameter that arbitrates between
-#' exploitation (selecting treatment arms with a high predicted reward $\hat{y}_i$),
-#' and exploration (selecting treatment arms with high uncertainty $U_t(i)$).
-#' The parameter $\lambda > 0$ introduces ridge regularization.
-#'
-#' For modelling, the package currently supports linear, and logistic regressions with
-#' ridge regularization, and allows for a first stage of variable selection using
-#' the LASSO, as well as the automatic selection of tuning parameters using
-#' K-fold cross-validation. All these functionalities are implemented using the
-#' \code{\link[glmnet]{glmnet}} package, wrapped into the new \code{\link{banditGlmnet}} class,
-#' that supports the formula interface.
+#' The introductory vignette provides a detailed
 
 #' @field alpha the linear UCB tuning parameter. See details.
-#' @field family supported response type. See banditGlmnet for details.
+#' @field family supported response type. See \code{\link{banditGlmnet}} for details.
 
 #' @section Methods:
 

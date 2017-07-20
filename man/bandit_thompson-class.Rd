@@ -62,7 +62,7 @@ abc
 \section{Methods}{
 
 
-\code{train(..., seed = NULL)} trains the model using the relevant function from
+\code{train(..., seed = NULL)} train the model using the relevant function from
 \code{\link{[rstanarm]rstanarm}} and all completed experiments. \code{...} are
 additional parameters passed on to the relevant function in \code{rstanarm}.
 \code{seed} is an optional seeding value for the random number generator.
@@ -76,6 +76,6 @@ In particular, it contains an \code{id} column that is a primary key.
 \code{addOutcomes(y)} add outcomes to the bandit. \code{y} is a named vector
 whose names are samples ids.
 
-\code{undo()} cancels the last job.
+\code{undo()} cancel the last job.
 }
 
