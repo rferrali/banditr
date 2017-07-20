@@ -2,7 +2,7 @@
 title: "Introduction to `banditr`"
 author: "Romain Ferrali"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{Introduction to banditr}
   %\VignetteEngine{knitr::rmarkdown}
