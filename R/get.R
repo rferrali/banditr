@@ -89,7 +89,7 @@ getModel.bandit_thompson <- function(object, what = "last") {
   data <- input$data
   rm(input)
   model$data <- data
-  model$model <- model.frame(model)
+  model$model <- model.frame(object, what)
   model$y <- model.response(model$model)
   return(model)
 }

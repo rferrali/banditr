@@ -1,14 +1,18 @@
 ---
-title: "Introduction to `banditr`"
-author: "Romain Ferrali"
-date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Introduction to banditr}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output: github_document
 bibliography: lib.bib
 ---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "README-"
+)
+```
+
 
 As Scott [-@Scott2010] defines: 
 
@@ -22,6 +26,15 @@ The `banditr` package implements several popular algorithms that solve the multi
 The `banditr` package provides a comprehensive solution that handles the entire experimental sequence. Because such sequential experiments may involve large amounts of data, the package allows storing its data locally, as a self-contained R object, but also remotely, using the host's filesystem and a database management system (DBMS). Currently, the package supports one DBMS: Microsoft SQL Server, through the [`RODBC`](https://cran.r-project.org/web/packages/RODBC/index.html) package. 
 
 This vignette gives an overview of how `banditr` handles `bandit` objects, using a LinUCB bandit as an example. Another vignette details how to use `banditr` with a DBMS. 
+
+## Installation
+
+You can install banditr from github with:
+
+```{r gh-installation, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("rferrali/banditr", build_vignettes = TRUE)
+```
 
 ## Bandit algorithms
 

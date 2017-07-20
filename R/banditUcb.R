@@ -12,7 +12,10 @@
 #' @template argBanditOpt
 
 #' @details
-#' The introductory vignette provides a detailed
+#' The RC class \code{"bandit_ucb"} inherits from class \code{"\link{bandit}"}.
+#'
+#' The introductory vignette provides a detailed explanation of LinUCB algorithms, and
+#' their implementation with \code{banditr}. See the Examples section.
 
 #' @field alpha the linear UCB tuning parameter. See details.
 #' @field family supported response type. See \code{\link{banditGlmnet}} for details.
@@ -45,6 +48,9 @@
 #' whose names are samples ids.
 #'
 #' \code{undo()} cancel the last job.
+#'
+#' @examples vignette("introduction", "banditr")
+#' @seealso \code{\link{bandit}}, \code{\link{bandit_thompson}}
 #'
 #' @export bandit_ucb
 #' @exportClass bandit_ucb

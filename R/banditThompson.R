@@ -11,11 +11,18 @@
 #'                   gamma = 1, contrasts = NULL, newLevels = FALSE,
 #'                   db = NULL, path = NULL)
 #' @template argBandit
-#' @param gamma the Thompson sampling tuning parameter. See details.
+#' @param gamma the Thompson sampling tuning parameter. A positive scalar. Higher
+#' values of \code{gamma} favor exploitation over exploration.
 #' @template argBanditOpt
 #' @details
+#' The RC class \code{"bandit_thompson"} inherits from class \code{"\link{bandit}"}.
+#' Three classes inherit from \code{"bandit_thompson"}: \code{"bandit_stan_lm"},
+#' \code{"bandit_stan_glm"}, and \code{"bandit_stan_glmer"}, for linear, generalized
+#' linear, and mixed effect models respectively.
 #'
-#' abc
+#' The introductory vignette provides a detailed explanation of Thompson sampling
+#'  algorithms, and
+#' their implementation with \code{banditr}. See the Examples section.
 #'
 #' @field gamma the Thompson sampling tuning parameter.
 #'
@@ -36,6 +43,10 @@
 #' whose names are samples ids.
 #'
 #' \code{undo()} cancel the last job.
+#'
+#' @seealso \code{\link{bandit}}, \code{\link{bandit_ucb}}
+#'
+#' @examples vignette("introduction", "banditr")
 
 bandit_thompson <- setRefClass("bandit_thompson",
                          contains = "bandit",

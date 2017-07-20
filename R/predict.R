@@ -132,9 +132,11 @@ predict.bandit_thompson <- function(object,
                     c("link","response","weight"),
                     several.ok = TRUE)
   data <- callNextMethod()
+  mfFit <- model.frame.bandit(object, whatModel)
   id <- data$samples$id
   data$samples <- get_all_vars(formula(data$model), data$samples)
   data$samples$y <- 0
+  data$model$model <- mfFit
   out <- list()
   if("link" %in% type) {
     out$link <- rstanarm::posterior_linpred(data$model,
@@ -144,6 +146,7 @@ predict.bandit_thompson <- function(object,
     out$link <- colMeans(out$link)
   }
   if(any(c("response", "weight") %in% type)) {
+    browser()
     response <- rstanarm::posterior_linpred(data$model,
                                             transform = TRUE,
                                             newdata = data$samples,

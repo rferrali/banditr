@@ -30,6 +30,16 @@ adding samples. Default is FALSE.}
 \description{
 A bandit reference class (RC) object.
 }
+\details{
+The RC \code{"bandit"} class is the main object defined in
+ \code{banditr}. It allows to manage bandit experiments easily. Two
+ classes inherit from \code{"bandit"}: the \code{"\link{bandit_ucb}"}
+ class for LinUCB algorithms, and the \code{"\link{bandit_thompson}"} for
+ Thompson sampling algorithms.
+
+ The introductory vignette provides a detailed explanation of bandit algorithms, and
+their implementation with \code{banditr}. See the Examples section.
+}
 \section{Fields}{
 
 \describe{
@@ -54,3 +64,9 @@ to that class): a symbolic description of the model that is fitted.}
 }}
 
 
+\examples{
+vignette("introduction", "banditr")
+}
+\seealso{
+\code{\link{bandit_ucb}}, \code{\link{bandit_thompson}}
+}

@@ -39,7 +39,10 @@ adding samples. Default is FALSE.}
 An UCB bandit reference class (RC) object.
 }
 \details{
-The introductory vignette provides a detailed
+The RC class \code{"bandit_ucb"} inherits from class \code{"\link{bandit}"}.
+
+The introductory vignette provides a detailed explanation of LinUCB algorithms, and
+their implementation with \code{banditr}. See the Examples section.
 }
 \section{Fields}{
 
@@ -80,3 +83,9 @@ whose names are samples ids.
 \code{undo()} cancel the last job.
 }
 
+\examples{
+vignette("introduction", "banditr")
+}
+\seealso{
+\code{\link{bandit}}, \code{\link{bandit_thompson}}
+}

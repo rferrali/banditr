@@ -35,7 +35,8 @@ contains the model response.}
 \item{family}{a character string describing the error distribtion and link function
 to be used in the model. Can be either \code{"binomial"} or \code{"gaussian"} (the default).}
 
-\item{gamma}{the Thompson sampling tuning parameter. See details.}
+\item{gamma}{the Thompson sampling tuning parameter. A positive scalar. Higher
+values of \code{gamma} favor exploitation over exploration.}
 
 \item{contrasts}{an optional list. See the \code{contrasts.arg} of \code{model.matrix.default}.}
 
@@ -50,7 +51,14 @@ adding samples. Default is FALSE.}
 A Thompson sampling bandit reference class (RC) object.
 }
 \details{
-abc
+The RC class \code{"bandit_thompson"} inherits from class \code{"\link{bandit}"}.
+Three classes inherit from \code{"bandit_thompson"}: \code{"bandit_stan_lm"},
+\code{"bandit_stan_glm"}, and \code{"bandit_stan_glmer"}, for linear, generalized
+linear, and mixed effect models respectively.
+
+The introductory vignette provides a detailed explanation of Thompson sampling
+ algorithms, and
+their implementation with \code{banditr}. See the Examples section.
 }
 \section{Fields}{
 
@@ -79,3 +87,9 @@ whose names are samples ids.
 \code{undo()} cancel the last job.
 }
 
+\examples{
+vignette("introduction", "banditr")
+}
+\seealso{
+\code{\link{bandit}}, \code{\link{bandit_ucb}}
+}
