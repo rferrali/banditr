@@ -27,7 +27,7 @@ devtools::install_github("rferrali/banditr", build_vignettes = TRUE)
 
 ## Tutorial
 
-A vignette provides a full-fledged tutorial to learn how to use the package. 
+A vignette provides a full-fledged tutorial to learn how to use the package. To view it, use: 
 
 ```{r example, eval = FALSE}
 vignette("introduction", "banditr")

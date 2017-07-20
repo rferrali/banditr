@@ -134,7 +134,7 @@ The Thompson sampling algorithm requires sampling the next observation using the
 
 ```{r}
 head(pr_thom)
-id_thom <- rownames(pr_thom)[sample.int(nrow(pr_thom, 1, prob = pr_thom$weight))]
+id_thom <- rownames(pr_thom)[sample.int(nrow(pr_thom), 1, prob = pr_thom$weight)]
 y_thom <- df$y[df$id == id_thom]
 y_thom
 ```
@@ -152,27 +152,32 @@ bdt_thom$addOutcomes(y_thom)
 bdt_thom$train(chains = 1)
 ```
 
-Note that the LinUCB bandit supports ridge regularization and variable selection with the LASSO. By default, the model uses neither. Both tuning parameters can be set manually, or using K-fold validation (with `cv.glmnet`).  Let's introduce some ridge regularization, and a stage of variable selection, then repeat the task a few times. 
+Note that the LinUCB bandit supports ridge regularization and variable selection with the LASSO. By default, the model uses neither. Both tuning parameters can be set manually, or using K-fold validation (with `cv.glmnet`).  Let's introduce some ridge regularization, and a stage of variable selection. 
 ```{r}
 # set the tuning parameter for ridge regularization to 1
 bdt_ucb$tune(param = 'lambdaRidge', value = 1) 
 # select the tuning parameter for the LASSO using 10-fold cross validation 
 bdt_ucb$tune(param = 'lambdaLasso', value = 'auto', lambdaAuto = 'lambda.1se')
-
-for (i in 1:20) {
-  pr <- predict(bdt)
-  id <- rownames(pr)[which.max(pr$score)]
-  y <- df$y[df$id == id]
-  names(y) <- id
-  bdt$addOutcomes(y)
-  bdt$train()
-}
 ```
 
 
 ## Diagnostics
 
-The `banditr` package provides a few built-in diagnostic plots, and allows for convenient extraction of relevant objects for further exploration.
+The `banditr` package provides a few built-in diagnostic plots, and allows for convenient extraction of relevant objects for further exploration. First, let's extend the experiment for a few more iterations:
+
+```{r}
+for (i in 1:20) {
+  pr_ucb <- predict(bdt_ucb)
+  id <- rownames(pr_ucb)[which.max(pr_ucb$score)]
+  y <- df$y[df$id == id]
+  names(y) <- id
+  bdt_ucb$addOutcomes(y)
+  bdt_ucb$train()
+}
+```
+
+
+The package provides two diagnostics plots: 
 
 ```{r, fig.height=5, fig.width=5}
 plot(bdt_ucb) # the default diagnostic: cumulative reward over time
@@ -181,7 +186,6 @@ plot(bdt_ucb) # the default diagnostic: cumulative reward over time
 
 ```{r, fig.show='hold', fig.height=5, fig.width=5}
 plot(bdt_ucb, what = "coef") # parameter values over time
-# plot(bdt, what = "MSE")
 ```
 
 Besides the standard `coef` method to extract current model coefficients, other extraction methods are prefixed with `get`. 
