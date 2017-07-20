@@ -21,6 +21,7 @@ The goal of banditr is to manage multi-armed bandit experiments. The package sup
 You can install banditr from github with:
 
 ```{r gh-installation, eval = FALSE}
+# uncomment the following line if the package devtools is not installed
 # install.packages("devtools")
 devtools::install_github("rferrali/banditr", build_vignettes = TRUE)
 ```
@@ -30,5 +31,6 @@ devtools::install_github("rferrali/banditr", build_vignettes = TRUE)
 A vignette provides a full-fledged tutorial to learn how to use the package. To view it, use: 
 
 ```{r example, eval = FALSE}
+library(banditr)
 vignette("introduction", "banditr")
 ```
