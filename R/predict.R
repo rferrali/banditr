@@ -146,7 +146,6 @@ predict.bandit_thompson <- function(object,
     out$link <- colMeans(out$link)
   }
   if(any(c("response", "weight") %in% type)) {
-    browser()
     response <- rstanarm::posterior_linpred(data$model,
                                             transform = TRUE,
                                             newdata = data$samples,

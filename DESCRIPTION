@@ -1,7 +1,7 @@
 Package: banditr
 Type: Package
 Title: Estimation of Multi-Armed Bandit Algorithms
-Version: 0.3.2
+Version: 0.3.3
 Authors@R: person("Romain", "Ferrali", email = "rferrali@gmail.com", 
   role = c("aut","cre"))
 Description: Estimation of linear UCB multi-armed bandit algorithms for
@@ -15,9 +15,9 @@ Imports:
     zoo (>= 1.7),
     stringi (>= 1.1.2),
     RODBC (>= 1.3), 
-    rstanarm, 
-    lme4, 
-    methods
+    rstanarm (>= 2.15.3), 
+    lme4 (>= 1.1), 
+    methods (>= 3.3.3)
 RoxygenNote: 6.0.1
 Suggests:
     testthat,

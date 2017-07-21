@@ -15,15 +15,11 @@ df <- cbind(id = 1:1000, df) # add a primary key to the data
 ## ------------------------------------------------------------------------
 library(banditr) # initialize the bandit using the first 100 samples
 start <- df[1:100,]
-bdt_ucb <- bandit_ucb(formula = y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10, 
-                  family = "binomial", 
-                  data = start)
+bdt_ucb <- bandit_ucb(formula = y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10, family = "binomial", data = start)
 summary(bdt_ucb)
 
 ## ------------------------------------------------------------------------
-bdt_thom <- bandit_stan_glm(formula = y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10, 
-                  family = "binomial", 
-                  data = start)
+bdt_thom <- bandit_stan_glm(formula = y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10, family = "binomial", data = start)
 
 ## ---- message=FALSE------------------------------------------------------
 bdt_ucb$train()
@@ -81,11 +77,19 @@ plot(bdt_ucb) # the default diagnostic: cumulative reward over time
 
 ## ---- fig.show='hold', fig.height=5, fig.width=5-------------------------
 plot(bdt_ucb, what = "coef") # parameter values over time
-# plot(bdt, what = "MSE")
 
 ## ------------------------------------------------------------------------
 coef(bdt_ucb)
 mod <- getModel(bdt_ucb) # extract the last model
 mf <- getSamples(bdt_ucb) # extract complete samples
 jobs <- getJobs(bdt_ucb) # extract a summary of all jobs
+
+## ---- eval=FALSE---------------------------------------------------------
+#  connectionString <- "driver={SQL Server};server=localhost;database=bandit"
+#  path <- "banditFolder/"
+#  bdt_db <- bandit_ucb(y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10,
+#                       family = "binomial",
+#                       data = start,
+#                       db = list(connection = connectionString),
+#                       path = path)
 

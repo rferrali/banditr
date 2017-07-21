@@ -88,6 +88,7 @@ bandit_stan_lm$methods(
   },
   train = function(..., seed = NULL) {
     cl <- as.list(match.call(expand.dots = FALSE))
+    args <- cl$`...`
     args$x <- args$y <- args$model <- FALSE
     callSuper(FUN = rstanarm::stan_lm,
               args = cl$`...`,

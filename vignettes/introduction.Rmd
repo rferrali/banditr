@@ -2,7 +2,7 @@
 title: "Introduction to `banditr`"
 author: "Romain Ferrali"
 date: "`r Sys.Date()`"
-output: rmarkdown::pdf_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to banditr}
   %\VignetteEngine{knitr::rmarkdown}
@@ -10,48 +10,48 @@ vignette: >
 bibliography: lib.bib
 ---
 
-As Scott [-@Scott2010] defines: 
+> A _multi-armed bandit_ is a sequential experiment with the goal of achieving the largest possible reward from a payoff distribution with unknown parameters. At each stage, the experimenter must decide which arm of the experiment to observe next. The choice involves a fundamental trade-off between the utility gain from exploiting arms that appear to be doing well (based on limited sample information) vs exploring arms that might potentially be optimal, but which appear to be inferior because of sampling variability. [@Scott2010]
 
-> A _multi-armed bandit_ is a sequential experiment with the goal of achieving the largest possible reward from a payoff distribution with unknown parameters. At each stage, the experimenter must decide which arm of the experiment to observe next. The choice involves a fundamental trade-off between the utility gain from exploiting arms that appear to be doing well (based on limited sample information) vs exploring arms that might potentially be optimal, but which appear to be inferior because of sampling variability.
+A bandit algorithm is a learning algorithm that approaches this problem in a principled way. It selects selects experimental arms to optimally balance between exploration and exploitation and maximize the reward in the long run. 
 
 The `banditr` package implements several popular algorithms that solve the multi-armed bandit problem. Currently, the package supports two algorithms: 
 
-* Thompson sampling [@Scott2010], using the [`rstanarm`](https://cran.r-project.org/web/packages/rstanarm/index.html) package. 
-* Linear Upper Confidence Bound [LinUCB, @Li2010a], with optional dimensionality reduction (Egami & Imai ???), using the [`glmnet`](https://cran.r-project.org/web/packages/glmnet/index.html) package. 
+* Thompson sampling [@Scott2010]. 
+* Linear Upper Confidence Bound [LinUCB, @Li2010a], with optional dimensionality reduction [@Egami2017]. 
 
-The `banditr` package provides a comprehensive solution that handles the entire experimental sequence. Because such sequential experiments may involve large amounts of data, the package allows storing its data locally, as a self-contained R object, but also remotely, using the host's filesystem and a database management system (DBMS). Currently, the package supports one DBMS: Microsoft SQL Server, through the [`RODBC`](https://cran.r-project.org/web/packages/RODBC/index.html) package. 
+The `banditr` package provides a comprehensive solution that handles the entire experimental sequence in a single object. Because such sequential experiments may involve large amounts of data, the package allows storing its data in memory, as a self-contained R object, but also remotely, using the host's filesystem and a database management system (DBMS). Currently, the package supports one DBMS: Microsoft SQL Server. 
 
 This vignette gives an overview of how `banditr` handles `bandit` objects, using a LinUCB bandit as an example. Another vignette details how to use `banditr` with a DBMS. 
 
 ## Bandit algorithms
 
-In the multi-armed bandit problem, the experimenter starts with $N_0$  completed experiments for which she observes the vector of outcomes $Y_0$, and the $N_0 \times K$ matrix $X_0$ of features. She has an $R_0 \times K$ matrix $Z$ of characteristics for treatment arms for which she does not observe the outcome. At each time period $t$, she selects a treatment arm $i$ for which she observes the outcome $y_i$. Her goal is to solve the following maximization problem: 
+In the multi-armed bandit problem, the experimenter starts with $M_0$  completed experiments for which she observes the vector of outcomes $Y_0$, and the $M_0 \times K$ matrix $X_0$ of features. She has an $N_0 \times K$ matrix $Z$ of characteristics for treatment arms for which she does not observe the outcome. At each time period $t$, she selects a treatment arm $i$ for which she observes the outcome $y_i$. Her goal is to solve the following maximization problem: 
 $$
-\max_{i \in \{1,...,R_t\}} y_i. 
+\max_{i \in \{1,...,R_t\}} y_i 
 $$
 
-Bandit algorithms implement mechanisms to solve this maximization problem. Suppose the model $Y = X \beta$. The LinUCB and Thompson sampling algorithms perform a similar task at each time period. They update the model using completed experiments, and provide a rule $f(\beta_t, Z_t): (\mathcal{R}^{K}, \mathcal{R}^{(R_t \times K)}) \rightarrow \{1,...,R_t\}$ to select the next next treatment arm: 
+Bandit algorithms implement mechanisms to solve this maximization problem. Suppose that the true model is $Y = X \beta$. The LinUCB and Thompson sampling algorithms perform a similar task at each time period. They update the model using completed experiments, and provide a rule $f(\beta_t, Z_t): (\mathbb{R}^{K}, \mathbb{R}^{(N_t \times K)}) \rightarrow \{1,...,N_t\}$ to select the next next treatment arm: 
 
 * Observe the outcome $y_i$ of the treatment arm selected at $t-1$. 
 * $Y_t \leftarrow (Y_{t-1}, y_i), X_t \leftarrow (X_{t-1}, z_i^T)$
 * Update the model parameters $\hat{\beta}_t$ by estimating the model $Y_t = X_t \beta$. 
-* Select the treatment arm $i = f(\beta_t, Z_t)$
+* Select the treatment arm $i = f(\hat{\beta}_t, Z_t)$
 
 ### Specifics of LinUCB
 
-Let $\hat{y}_{it}$ be the predicted outcome for treatment arm $i$. At each time period $t$, the LinUCB algorithm selects the experimental arm $i$ that maximizes $p(i,t) = \hat{y}_i^T \beta_t + \alpha U_t(i)$, where $U_t(i) = \sqrt{z_i^T\left(X_t^T X_t + \lambda I_K \right)^{-1} z_i}$. The parameter $\alpha \geq 0$ is a tuning parameter that arbitrates between exploitation (selecting treatment arms with a high predicted reward $\hat{y}_i$), and exploration (selecting treatment arms with high uncertainty $U_t(i)$). The parameter $\lambda > 0$ introduces ridge regularization. 
+Let $\hat{y}_{it}$ be the predicted outcome for treatment arm $i$. At each time period $t$, the LinUCB algorithm selects the experimental arm $i$ with the highest upper confidence bound $p(i,t) = \hat{y}_i^T \hat{\beta}_t + \alpha U_t(i)$, where $U_t(i) = \sqrt{z_i^T\left(X_t^T X_t + \lambda I_K \right)^{-1} z_i}$ is the uncertainty around $\hat{y}_i$. The parameter $\alpha \geq 0$ is a tuning parameter that arbitrates between exploitation (selecting treatment arms with a high predicted reward $\hat{y}_i$), and exploration (selecting treatment arms with high uncertainty $U_t(i)$). The parameter $\lambda > 0$ introduces ridge regularization. 
 
-For modelling, the package currently supports linear, and logistic regressions with ridge regularization, and allows for a first stage of variable selection using the LASSO, as well as the automatic selection of tuning parameters using $K-fold$ cross-validation. All these functionalities are implemented using the `glmnet` package, wrapped into the new `banditGlmnet` class, that supports the formula interface. 
+For modelling, the package currently supports linear, and logistic regressions with ridge regularization, and allows for a first stage of variable selection using the LASSO, as well as the automatic selection of tuning parameters using K-fold cross-validation. All these functionalities are implemented using the [`glmnet`](https://cran.r-project.org/web/packages/glmnet/index.html) package, wrapped into a new `banditGlmnet` class, that supports the formula interface. 
 
 ### Specifics of Thompson sampling
 
-The Thomspon sampling algorithm operate in a Bayesian framework. At each time period, the algorithm selects the next experimental arm at random, with a weight that is a function of the posterior expected predicted probability of maximizing the reward. Let $\hat{y}_{it}(\beta)$ be the predicted outcome for treatment arm $i$ at time $t$ for parameters $\beta$, and define $I_{it}(\beta) = 1$ if treatment arm $i$ solves $\max_{i \in (1, ..., Z_t)} \hat{y}_{it}(\beta)$, and $I_{it}(\beta) = 0$ otherwise. Then the Thompson sampling weights for arm $i$ at time $t$ can be estimated with the following: 
+The Thomspon sampling algorithm operate in a Bayesian framework. That is, model parameters follow a posterior distribution $\Pr(\beta_t | X_t, Y_t)$ At each time period, the algorithm selects the next experimental arm at random, with a weight proportional to the posterior expected predicted probability of maximizing the reward. Let $\hat{y}_{it}(\beta)$ be the predicted outcome for treatment arm $i$ at time $t$ for parameters $\beta$, and define $I_{it}(\beta) = 1$ if treatment arm $i$ solves $\max_{i \in (1, ..., Z_t)} \hat{y}_{it}(\beta)$, and $I_{it}(\beta) = 0$ otherwise. Then the Thompson sampling weights for arm $i$ at time $t$ can be estimated with the following: 
 $$
-w_{it} = \frac{1}{M} \sum_{m=1}^M I_{it}(\beta^{(m)}), 
+w_{it} = \frac{1}{M} \sum_{m=1}^M I_{it}(\beta_t^{(m)}), 
 $$
 where $\beta^{(m)}$ is the $m$-th draw from the posterior distribution at time $t$. The equation basically defines weights as the proportion of posterior draws for which $i$ is maximal. One can set the amount of exploration by sampling according to some weight $w_{it}^\gamma$, where the algorithm will tend to explore more for $\gamma < 1$, and exploit more for $\gamma > 1$. 
 
-For modelling, the package currently supports linear, and logistic regressions, as well as random effect models. Estimation is conducted using the `rstanarm` package. 
+For modelling, the package currently supports linear, and logistic regressions, as well as random effect models. Estimation is conducted using the [`rstanarm`](https://cran.r-project.org/web/packages/rstanarm/index.html) package. 
 
 ## Creating a bandit object
 
@@ -79,23 +79,19 @@ The package uses Reference Classes (RC) to store bandit objects. To handle futur
 df <- cbind(id = 1:1000, df) # add a primary key to the data
 ```
 
-In this vignette, we create a LinUCB bandit that uses a binomial logistic regression. By default, the package uses a value of $\alpha = 1$ as a tuning parameter. Let's create a LinUCB bandit and inspect it. 
+Let's create a LinUCB bandit. By default, the package uses a value of $\alpha = 1$ as a tuning parameter. Let's create a binomial LinUCB bandit and inspect it. 
 
 ```{r}
 library(banditr) # initialize the bandit using the first 100 samples
 start <- df[1:100,]
-bdt_ucb <- bandit_ucb(formula = y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10, 
-                  family = "binomial", 
-                  data = start)
+bdt_ucb <- bandit_ucb(formula = y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10, family = "binomial", data = start)
 summary(bdt_ucb)
 ```
 
 Thomspon sampling bandits are created in a similar way, and use a default value $\gamma = 1$ for the tuning parameter: 
 
 ```{r}
-bdt_thom <- bandit_stan_glm(formula = y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10, 
-                  family = "binomial", 
-                  data = start)
+bdt_thom <- bandit_stan_glm(formula = y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10, family = "binomial", data = start)
 ```
 
 
@@ -130,7 +126,7 @@ y_ucb <- df$y[df$id == id_ucb]
 y_ucb
 ```
 
-The Thompson sampling algorithm requires sampling the next observation using the Thompson weights. 
+The Thompson sampling algorithm requires sampling the next observation with sampling weights. 
 
 ```{r}
 head(pr_thom)
@@ -152,7 +148,7 @@ bdt_thom$addOutcomes(y_thom)
 bdt_thom$train(chains = 1)
 ```
 
-Note that the LinUCB bandit supports ridge regularization and variable selection with the LASSO. By default, the model uses neither. Both tuning parameters can be set manually, or using K-fold validation (with `cv.glmnet`).  Let's introduce some ridge regularization, and a stage of variable selection. 
+Note that the LinUCB bandit supports ridge regularization and variable selection with the LASSO. By default, the model uses neither. Both tuning parameters can be set manually, or using K-fold validation (with `glmnet::cv.glmnet`).  Let's introduce some ridge regularization, and a stage of variable selection. 
 ```{r}
 # set the tuning parameter for ridge regularization to 1
 bdt_ucb$tune(param = 'lambdaRidge', value = 1) 
@@ -196,6 +192,36 @@ mod <- getModel(bdt_ucb) # extract the last model
 mf <- getSamples(bdt_ucb) # extract complete samples
 jobs <- getJobs(bdt_ucb) # extract a summary of all jobs
 ```
+
+
+## Using a DBMS
+
+Bandits can either be stored in memory, as a self-contained R object, or store the data remotely, using a DBMS and the host's filesystem. Currently, only Microsoft SQL Server is supported, through the [`RODBC`](https://cran.r-project.org/web/packages/RODBC/index.html) package. 
+
+Remote bandits are created the same way as local bandit, but take two extra arguments: `db`, which is a list passed to `RODBC::odbcDriverConnect` to establish the connection with the database, and `path`, which is the folder in which models will be stored. 
+
+```{r, eval=FALSE}
+connectionString <- "driver={SQL Server};server=localhost;database=bandit"
+path <- "banditFolder/"
+bdt_db <- bandit_ucb(y ~ -1 + v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10, 
+                     family = "binomial", 
+                     data = start,
+                     db = list(connection = connectionString),
+                     path = path)
+```
+
+The tables created by `banditr` use the following schema: 
+
+* `jobs`: completed jobs. 
+    + `job`: primary key
+* `samples`: samples, and their (possibly NULL) outcomes; added to the bandit using `addSamples()` and `addOutcomes()` respectively. 
+    + `id`: primary key
+    + `jobSamples`: foreign key on `jobs.job`
+    + `jobOutcome`: foreign key on `jobs.job`
+* `stats`: statistics on samples, computed when using `addOutcomes()`
+    + `id`: foreign key on `samples.id`
+* `coef`: value of model coefficients after each training job. 
+    + `jobTrain`: foreign key on `jobs.job`
 
 
 # References 
