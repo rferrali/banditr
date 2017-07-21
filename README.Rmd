@@ -23,14 +23,15 @@ You can install banditr from github with:
 ```{r gh-installation, eval = FALSE}
 # uncomment the following line if the package devtools is not installed
 # install.packages("devtools")
-devtools::install_github("rferrali/banditr", build_vignettes = TRUE)
+devtools::install_github("rferrali/banditr")
 ```
 
 ## Tutorial
 
-A vignette provides a full-fledged tutorial to learn how to use the package. To view it, use: 
+A tutorial is available [here](http://rferrali.github.io/banditr). It is also available as a vigentte in the package. To access the vignette, make sure to compile it as you install the package, and use: 
 
 ```{r example, eval = FALSE}
+# devtools::install_github("rferrali/banditr", build_vignettes = TRUE)
 library(banditr)
 vignette("introduction", "banditr")
 ```
