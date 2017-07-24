@@ -8,7 +8,11 @@ model.frame.bandit <- function(formula, what = "last", ...) {
   f <- formula(formula, what = what, reduced = FALSE)
   mf <- rSamples(formula$banditData, what)
   mf$jobSamples <- mf$jobOutcome <- NULL
-  xlev <- ifelse(formula$newLevels, NULL, formula$xlevels)
+  if(formula$newLevels) {
+    xlev <- NULL
+  } else {
+    xlev <- formula$xlevels
+  }
   model.frame(f, mf, xlev = xlev)
 }
 
@@ -24,7 +28,11 @@ model.frame.bandit_ucb <- function(formula, what = "last", reduced = FALSE) {
   } else {
     f <- formula(formula, what, reduced)
     mf <- rSamples(formula$banditData, what)
-    xlev <- ifelse(formula$newLevels, NULL, formula$xlevels)
+    if(formula$newLevels) {
+      xlev <- NULL
+    } else {
+      xlev <- formula$xlevels
+    }
     model.frame(f, mf, xlev = xlev)
   }
 }

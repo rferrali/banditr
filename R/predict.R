@@ -75,7 +75,7 @@ predict.bandit_ucb <- function(object,
   data <- callNextMethod()
   # prediction
   reduced <- !is.null(data$model$lasso)
-  tt <- terms(formula(object, whatModel, reduced = reduced))
+  tt <- terms(formula(object, whatModel, reduced = FALSE))
   tt <- delete.response(tt)
   if(object$newLevels) {
     xlev <- NULL
@@ -86,14 +86,33 @@ predict.bandit_ucb <- function(object,
   if(nrow(x) > 0) {
     x <- model.matrix.default(tt, x, object$contrasts)
     intercept <- as.logical(attr(x = tt, "intercept"))
+    if(reduced) {
+      ttReduced <- terms(formula(object, whatModel, reduced = TRUE))
+      ttReduced <- delete.response(ttReduced)
+      intercept <- as.logical(attr(x = ttReduced, "intercept"))
+      ttReduced <- attr(ttReduced, "term.labels")
+      nn <- nrow(x)
+      x <- x[,ttReduced]
+      x <- matrix(x, nrow = nn)
+      colnames(x) <- ttReduced
+      if(intercept) x <- cbind(`(Intercept)` = 1, x)
+    }
     xGlmnet <- x
     if(intercept) xGlmnet <- dropIntercept(xGlmnet)
+
     if(any(c("response","score") %in% type)) {
       outResponse <- predict(data$model$glmnet, newx = xGlmnet, type = "response")[,1]
     }
     if(any(c("uncertainty","score") %in% type)) {
-      xU <- model.frame(object, whatModel, reduced = reduced)
+      xU <- model.frame(object, whatModel, reduced = FALSE)
       xU <- model.matrix.default(tt, xU, object$contrasts)
+      if(reduced) {
+        nn <- nrow(xU)
+        xU <- xU[,ttReduced]
+        xU <- matrix(xU, nrow = nn)
+        colnames(xU) <- ttReduced
+        if(intercept) xU <- cbind(`(Intercept)` = 1, xU)
+      }
       zU <- x
       tune <- rTune(object$banditData, whatModel, c("lambdaRidge", "lambdaLasso"))$lambdaRidge
       outUncertainty <- uncertainty(xU, zU, tune, robust)

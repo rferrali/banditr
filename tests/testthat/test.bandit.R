@@ -4,7 +4,7 @@ context("Test bandit")
 test_that("bandit initializes correctly, RC methods work", {
   # data generation
   x <- matrix(rnorm(10e3), 1e3, 10)
-  beta <- -4:5
+  beta <- c(1,1,rep(0,8))
   y <- as.numeric(plogis(x %*% beta))
   y <- sapply(y, rbinom, n = 1, size = 1)
   colnames(x) <- paste0("v", 1:10)
