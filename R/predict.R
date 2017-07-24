@@ -77,7 +77,7 @@ predict.bandit_ucb <- function(object,
   reduced <- !is.null(data$model$lasso)
   tt <- terms(formula(object, whatModel, reduced = reduced))
   tt <- delete.response(tt)
-  if(objects$newLevels) {
+  if(object$newLevels) {
     xlev <- NULL
   } else {
     xlev <- object$xlevels
