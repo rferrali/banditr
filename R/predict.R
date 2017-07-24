@@ -77,7 +77,11 @@ predict.bandit_ucb <- function(object,
   reduced <- !is.null(data$model$lasso)
   tt <- terms(formula(object, whatModel, reduced = reduced))
   tt <- delete.response(tt)
-  xlev <- ifelse(object$newLevels, NULL, object$xlevels)
+  if(objects$newLevels) {
+    xlev <- NULL
+  } else {
+    xlev <- object$xlevels
+  }
   x <- model.frame.default(tt, data$samples, xlev = xlev)
   if(nrow(x) > 0) {
     x <- model.matrix.default(tt, x, object$contrasts)
