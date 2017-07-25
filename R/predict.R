@@ -87,15 +87,14 @@ predict.bandit_ucb <- function(object,
     x <- model.matrix.default(tt, x, object$contrasts)
     intercept <- as.logical(attr(x = tt, "intercept"))
     if(reduced) {
-      ttReduced <- terms(formula(object, whatModel, reduced = TRUE))
-      ttReduced <- delete.response(ttReduced)
-      intercept <- as.logical(attr(x = ttReduced, "intercept"))
-      ttReduced <- attr(ttReduced, "term.labels")
+      ttReduced <- coef(data$model$lasso)[,1]
+      intercept2 <- ttReduced[1] != 0
+      if(!intercept) ttReduced <- ttReduced[-1]
+      ttReduced <- which(ttReduced != 0)
       nn <- nrow(x)
       x <- x[,ttReduced]
       x <- matrix(x, nrow = nn)
-      colnames(x) <- ttReduced
-      if(intercept) x <- cbind(`(Intercept)` = 1, x)
+      intercept <- intercept2
     }
     xGlmnet <- x
     if(intercept) xGlmnet <- dropIntercept(xGlmnet)
@@ -110,8 +109,6 @@ predict.bandit_ucb <- function(object,
         nn <- nrow(xU)
         xU <- xU[,ttReduced]
         xU <- matrix(xU, nrow = nn)
-        colnames(xU) <- ttReduced
-        if(intercept) xU <- cbind(`(Intercept)` = 1, xU)
       }
       zU <- x
       tune <- rTune(object$banditData, whatModel, c("lambdaRidge", "lambdaLasso"))$lambdaRidge
