@@ -1,7 +1,7 @@
 Package: banditr
 Type: Package
 Title: Estimation of Multi-Armed Bandit Algorithms
-Version: 0.3.3
+Version: 0.3.4
 Authors@R: person("Romain", "Ferrali", email = "rferrali@gmail.com", 
   role = c("aut","cre"))
 Description: Estimation of linear UCB multi-armed bandit algorithms for

@@ -7,7 +7,8 @@ protoBanditGlmnet <- function(formula,
                               seed = NULL,
                               parRidge = NULL,
                               parLasso = NULL,
-                              contrasts = NULL) UseMethod("protoBanditGlmnet")
+                              contrasts = NULL,
+                              xlevels = NULL) UseMethod("protoBanditGlmnet")
 
 protoBanditGlmnet.default <- function(formula,
                                  family = c("gaussian", "binomial"),
@@ -17,13 +18,15 @@ protoBanditGlmnet.default <- function(formula,
                                  seed = NULL,
                                  parRidge = NULL,
                                  parLasso = NULL,
-                                 contrasts = NULL) {
+                                 contrasts = NULL,
+                                 xlevels = NULL) {
   call <- match.call()
   # model.frame
   mf <- match.call(expand.dots = FALSE)
   m <- match(c("formula", "data"), names(mf), 0L)
   mf <- mf[c(1L, m)]
   mf$drop.unused.levels <- FALSE
+  mf$xlev <- xlevels
   mf[[1L]] <- quote(stats::model.frame)
   mf <- eval(mf, parent.frame())
   # other components
@@ -77,7 +80,8 @@ tuneBandit <- function(param,
                  data,
                  seed = NULL,
                  parCvGlmnet = NULL,
-                 contrasts = NULL) {
+                 contrasts = NULL,
+                 xlevels = NULL) {
   # validation
   if(is.null(seed)) seed <- sample(1e5, 1)
   param <- match.arg(param, c("lambdaLasso", "lambdaRidge"))
@@ -96,7 +100,7 @@ tuneBandit <- function(param,
   set.seed(seed)
   model <- NULL
   if(!is.numeric(value)) {
-    data <- model.frame(formula, data)
+    data <- model.frame(formula, data, xlev = xlevels)
     x <- model.matrix(formula, data, contrasts.arg = contrasts)
     terms <- terms(formula)
     intercept <- as.logical(attr(terms, "intercept"))

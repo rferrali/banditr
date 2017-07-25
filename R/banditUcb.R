@@ -76,11 +76,17 @@ bandit_ucb$methods(
   train = function(parRidge = NULL,
                    parLasso = NULL,
                    seed = NULL) {
+    if(newLevels) {
+      xlev <- NULL
+    } else {
+      xlev <- xlevels
+    }
     args <- list(family = family,
                  lambdaRidge = currentParams$lambdaRidge,
                  lambdaLasso = currentParams$lambdaLasso,
                  parRidge = parRidge,
-                 parLasso = parLasso)
+                 parLasso = parLasso,
+                 xlevels = xlev)
     callSuper(FUN = protoBanditGlmnet, args = args, seed = seed)
   },
   tune = function(param = 'lambdaRidge',
@@ -88,12 +94,18 @@ bandit_ucb$methods(
                   lambdaAuto = 'lambda.1se',
                   parCvGlmnet = NULL,
                   seed = NULL) {
+    if(newLevels) {
+      xlev <- NULL
+    } else {
+      xlev <- xlevels
+    }
     args <- list(param = param,
                  value = value,
                  lambdaAuto = lambdaAuto,
                  family = family,
                  currentLasso = currentParams$lambdaLasso,
-                 parCvGlmnet = parCvGlmnet)
+                 parCvGlmnet = parCvGlmnet,
+                 xlevels = xlev)
     callSuper(FUN = tuneBandit, args = args, seed = seed)
   },
   addSamples = function(df) {
