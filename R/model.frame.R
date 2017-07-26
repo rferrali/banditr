@@ -7,6 +7,12 @@
 model.frame.bandit <- function(formula, what = "last", ...) {
   f <- formula(formula, what = what, reduced = FALSE)
   mf <- rSamples(formula$banditData, what)
+  if(!is.null(formula$cap)) {
+    if(nrow(mf) > formula$cap) {
+      mf <- mf[order(-mf$jobOutcome),]
+      mf <- mf[1:formula$cap,]
+    }
+  }
   mf$jobSamples <- mf$jobOutcome <- NULL
   if(formula$newLevels) {
     xlev <- NULL
@@ -28,6 +34,12 @@ model.frame.bandit_ucb <- function(formula, what = "last", reduced = FALSE) {
   } else {
     f <- formula(formula, what, reduced)
     mf <- rSamples(formula$banditData, what)
+    if(!is.null(formula$cap)) {
+      if(nrow(mf) > formula$cap) {
+        mf <- mf[order(-mf$jobOutcome),]
+        mf <- mf[1:formula$cap,]
+      }
+    }
     if(formula$newLevels) {
       xlev <- NULL
     } else {

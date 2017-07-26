@@ -39,10 +39,10 @@ test_that("bandit initializes correctly, RC methods work", {
                         db = list(connection = 'driver={SQL Server};server=DESKTOP-99SSI5O\\SQLEXPRESS;database=tafra'),
                         path = "../../../test/"))
 
-  b1 <- bandit_ucb(formula = f, family = "binomial", data = start)
+  b1 <- bandit_ucb(formula = f, family = "binomial", data = start, cap = 10)
   b2 <- bandit_ucb(formula = f, family = "binomial", data = start,
                  db = list(connection = 'driver={SQL Server};server=DESKTOP-99SSI5O\\SQLEXPRESS;database=tafra'),
-                 path = "../../../test/")
+                 path = "../../../test/", cap = 10)
   # b2 <- banditDb(formula = f, family = "binomial", data = start,
   #                db = list(connection = 'driver={SQL Server};server=DESKTOP-99SSI5O\\SQLEXPRESS;database=tafra'),
   #                path = "../test/")

@@ -44,11 +44,13 @@ bandit <- setRefClass("bandit",
                                     currentModel = "ANY",
                                     currentParams = "list",
                                     banditData = "ANY",
-                                    statistics = "character"))
+                                    statistics = "character",
+                                    cap = "ANY"))
 
 bandit$methods(
   initialize = function(formula, data, family,
                         contrasts = NULL,
+                        cap = NULL,
                         newLevels = FALSE,
                         db = NULL,
                         path = NULL,
@@ -76,6 +78,7 @@ bandit$methods(
     initFields(formula = formula,
                banditData = data,
                contrasts = contrasts,
+               cap = cap,
                currentJob = 1,
                currentModel = NULL)
   },
@@ -121,6 +124,12 @@ bandit$methods(
   train = function(FUN, args, seed) {
     args$data <- args$formula <- args$contrats <- args$seed <- NULL
     data <- rSamples(banditData, what = "current")
+    if(!is.null(cap)) {
+      if(nrow(data) > cap) {
+        data <- data[order(-data$jobOutcome),]
+        data <- data[1:cap,]
+      }
+    }
     data$jobSamples <- data$jobOutcome <- NULL
     args <- c(args,
               list(data = data,
@@ -148,6 +157,12 @@ bandit$methods(
   },
   tune = function(FUN, args, seed) {
     data <- rSamples(banditData, what = "current")
+    if(!is.null(cap)) {
+      if(nrow(data) > cap) {
+        data <- data[order(-data$jobOutcome),]
+        data <- data[1:cap,]
+      }
+    }
     args <- c(args,
               list(formula = formula,
                    data = data,
