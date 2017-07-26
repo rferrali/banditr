@@ -14,24 +14,32 @@ dfData <- function(jobs, samples, statistics) {
 
 dbData <- function(jobs, samples, statistics, db, path) {
   conn <- do.call(RODBC::odbcDriverConnect, db)
+  RODBC::sqlDrop(conn, "dbo.coef", errors = FALSE)
+  RODBC::sqlDrop(conn, "dbo.stats", errors = FALSE)
   RODBC::sqlDrop(conn, "dbo.samples", errors = FALSE)
+  RODBC::sqlDrop(conn, "dbo.jobs", errors = FALSE)
+
   RODBC::sqlSave(conn, samples, "dbo.samples", rownames = FALSE, safer = FALSE,
                  varTypes = c(jobSamples = "int",
                               jobOutcome = "int"))
-  RODBC::sqlDrop(conn, "dbo.jobs", errors = FALSE)
+  RODBC::sqlQuery(conn, "ALTER TABLE dbo.samples ALTER COLUMN id int NOT NULL")
+  RODBC::sqlQuery(conn, "ALTER TABLE dbo.samples ADD PRIMARY KEY (id)")
   RODBC::sqlQuery(conn, "CREATE TABLE [dbo].[jobs](
-                  [job] [int] NOT NULL,
+                  [job] [int] NOT NULL PRIMARY KEY,
                   [date] [datetime] NOT NULL,
                   [type] [varchar](50) NOT NULL,
                   [param] [varchar](50) NULL,
                   [value] [float] NULL
   )")
     RODBC::sqlSave(conn, jobs, "dbo.jobs", rownames = FALSE, append = TRUE)
-    RODBC::sqlDrop(conn, "dbo.stats", errors = FALSE)
     query <- sprintf("CREATE TABLE [dbo].[stats] ([id] [int] NOT NULL, %s)",
                      paste0("[", statistics, rep("] [float]", length(statistics)), collapse = ", "))
     RODBC::sqlQuery(conn, query)
-    RODBC::sqlDrop(conn, "dbo.coef", errors = FALSE)
+
+    RODBC::sqlQuery(conn, "ALTER TABLE dbo.samples ADD FOREIGN KEY (jobSamples) REFERENCES dbo.jobs(job)")
+    RODBC::sqlQuery(conn, "ALTER TABLE dbo.samples ADD FOREIGN KEY (jobOutcome) REFERENCES dbo.jobs(job)")
+    RODBC::sqlQuery(conn, "ALTER TABLE dbo.statistics ADD FOREIGN KEY (id) REFERENCES dbo.samples(id)")
+
     RODBC::odbcClose(conn)
     out <- list(db = db,
                 models = c(NA),
@@ -187,6 +195,7 @@ wCoef.dbData <- function(data, coef, job) {
     names(types) <- colnames(coef)
     RODBC::sqlSave(conn, coef, "dbo.coef", rownames = FALSE, append = TRUE,
                    varTypes = types)
+    RODBC::sqlQuery(conn, "ALTER TABLE dbo.coef ADD FOREIGN KEY (jobTrain) REFERENCES dbo.jobs(job)")
   }
   else {
     RODBC::sqlSave(conn, coef, "dbo.coef", rownames = FALSE, append = TRUE)
@@ -266,7 +275,7 @@ dJobs.dbData <- function(data) {
 
 dCoef <- function(data) UseMethod("dCoef", data)
 dCoef.dfData <- function(data) {
-  data$coefs <- data$coefs[-nrow(data$coefs),]
+  data$coef <- data$coef[-nrow(data$coef),]
   data
 }
 dCoef.dbData <- function(data) {
@@ -281,7 +290,7 @@ dStatistics <- function(data) UseMethod("dStatistics", data)
 dStatistics.dfData <- function(data) {
   del <- merge(data$stats, data$samples[,c("id", "jobOutcome")])
   del <- del$id[del$jobOutcome == max(del$jobOutcome)]
-  data$stats <- data$stats[!stats$id %in% del,]
+  data$stats <- data$stats[!data$stats$id %in% del,]
   data
 }
 dStatistics.dbData <- function(data) {

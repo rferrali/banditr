@@ -86,9 +86,9 @@ bandit$methods(
     df$jobOutcome <- NA
 
     vViolatePrimaryKey(banditData, df)
+    banditData <<- wJob(banditData, currentJob, "addSamples")
     banditData <<- wSamples(banditData, df)
     banditData <<- wModel(banditData)
-    banditData <<- wJob(banditData, currentJob, "addSamples")
     currentJob <<- currentJob + 1
   },
   addOutcomes = function(y, ...) {
@@ -112,10 +112,10 @@ bandit$methods(
       pr <- cbind(id = rownames(pr), pr)
     }
     rownames(pr) <- NULL
+    banditData <<- wJob(banditData, currentJob, "addOutcomes")
     banditData <<- wOutcome(banditData, y, currentJob)
     banditData <<- wModel(banditData)
     banditData <<- wStatistics(banditData, pr)
-    banditData <<- wJob(banditData, currentJob, "addOutcomes")
     currentJob <<- currentJob + 1
   },
   train = function(FUN, args, seed) {
@@ -141,8 +141,8 @@ bandit$methods(
     } else {
       coef <- coef(model)
     }
-    banditData <<- wCoef(banditData, coef, currentJob)
     banditData <<- wJob(banditData, currentJob, "train")
+    banditData <<- wCoef(banditData, coef, currentJob)
     currentModel <<- model
     currentJob <<- currentJob + 1
   },
@@ -154,25 +154,28 @@ bandit$methods(
                    seed = seed,
                    contrasts = contrasts))
     tu <- do.call(FUN, args)
-    banditData <<- wModel(banditData, tu$model, currentJob)
     banditData <<- wJob(banditData, currentJob, "tune", param = tu$param, value = tu$value)
+    banditData <<- wModel(banditData, tu$model, currentJob)
     currentParams[[tu$param]] <<- tu$value
     currentJob <<- currentJob + 1
   },
   undo = function() {
     lastJob <- rJobs(banditData, "last")
     type <- lastJob$type
-    banditData <<- dJobs(banditData)
     banditData <<- dModels(banditData)
     if (type == "addSamples") {
       banditData <<- dSamples(banditData)
+      banditData <<- dJobs(banditData)
     } else if (type == "addOutcomes") {
       banditData <<- dStatistics(banditData)
       banditData <<- dOutcomes(banditData)
+      banditData <<- dJobs(banditData)
     } else if (type == "train") {
       banditData <<- dCoef(banditData)
+      banditData <<- dJobs(banditData)
       currentModel <<- rTrain(banditData, "last")
     } else if (type == "tune") {
+      banditData <<- dJobs(banditData)
       currentParams <<- rTune(banditData, currentJob-1, c("lambdaRidge", "lambdaLasso"))
     }
     currentJob <<- currentJob - 1
