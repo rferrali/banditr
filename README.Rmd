@@ -28,7 +28,7 @@ devtools::install_github("rferrali/banditr")
 
 ## Tutorial
 
-A tutorial is available [here](http://rferrali.github.io/banditr). It is also available as a vigentte in the package. To access the vignette, make sure to compile it as you install the package, and use: 
+A tutorial is available [here](http://rferrali.github.io/banditr). It is also available as a vignette in the package. To access the vignette, make sure to compile it as you install the package, and use: 
 
 ```{r example, eval = FALSE}
 # devtools::install_github("rferrali/banditr", build_vignettes = TRUE)
